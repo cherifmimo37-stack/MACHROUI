@@ -35,21 +35,28 @@ router.get("/stores", async (req, res) => {
          s.name,
          s.slug,
          s.description,
-         s.category,
+         c.name AS category,
+         c.slug AS category_slug,
          s.wilaya,
          s.commune,
          s.logo_url,
          s.cover_url,
          COUNT(p.id)::int AS products_count
        FROM stores s
+       LEFT JOIN categories c
+         ON c.id = s.category_id
        LEFT JOIN products p
          ON p.store_id = s.id
-        AND p.status = 'active'
+        AND p.product_status = 'active'
        WHERE s.store_status = 'active'
          AND ($1 = '' OR s.name ILIKE '%' || $1 || '%')
          AND ($2 = '' OR s.wilaya = $2)
-         AND ($3 = '' OR s.category = $3)
-       GROUP BY s.id
+         AND (
+           $3 = ''
+           OR c.slug = $3
+           OR c.name = $3
+         )
+       GROUP BY s.id, c.name, c.slug
        ORDER BY s.name ASC
        LIMIT $4 OFFSET $5`,
       [search, wilaya, category, limit, offset]
@@ -88,18 +95,21 @@ router.get("/stores/:slug", async (req, res) => {
   try {
     const result = await pool.query(
       `SELECT
-         id,
-         name,
-         slug,
-         description,
-         category,
-         wilaya,
-         commune,
-         logo_url,
-         cover_url
-       FROM stores
-       WHERE slug = $1
-         AND store_status = 'active'
+         s.id,
+         s.name,
+         s.slug,
+         s.description,
+         c.name AS category,
+         c.slug AS category_slug,
+         s.wilaya,
+         s.commune,
+         s.logo_url,
+         s.cover_url
+       FROM stores s
+       LEFT JOIN categories c
+         ON c.id = s.category_id
+       WHERE s.slug = $1
+         AND s.store_status = 'active'
        LIMIT 1`,
       [req.params.slug]
     );
@@ -179,8 +189,8 @@ router.get("/stores/:slug/products", async (req, res) => {
          ) AS image_url
        FROM products p
        WHERE p.store_id = $1
-         AND p.status = 'active'
-       ORDER BY p.id DESC
+         AND p.product_status = 'active'
+       ORDER BY p.created_at DESC
        LIMIT $2 OFFSET $3`,
       [storeResult.rows[0].id, limit, offset]
     );
