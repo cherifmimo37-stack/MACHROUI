@@ -1,0 +1,267 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>متابعة الطلب | مشروعي</title>
+<style>
+:root{
+  --purple:#452078;
+  --purple2:#6e35a0;
+  --gold:#c99732;
+  --bg:#faf8fc;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Tahoma,Arial,sans-serif;
+  background:var(--bg);
+  color:#30283a;
+}
+header{
+  background:var(--purple);
+  padding:16px 6%;
+  color:white;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.logo{font-size:24px;font-weight:bold}
+.logo span{color:#e7bd68}
+header a{
+  color:white;
+  text-decoration:none;
+  border:1px solid #ffffff55;
+  padding:9px 14px;
+  border-radius:8px;
+}
+.container{
+  max-width:760px;
+  margin:35px auto;
+  padding:0 17px;
+}
+.heading{text-align:center;margin-bottom:27px}
+.heading h1{color:var(--purple);margin-bottom:9px}
+.heading p{color:#777;font-size:14px}
+.card{
+  background:white;
+  padding:24px;
+  border-radius:15px;
+  border:1px solid #eee8f2;
+  margin-bottom:20px;
+}
+.card h2{font-size:18px;color:var(--purple);margin:0 0 18px}
+.search-form{display:flex;gap:10px}
+.search-form input{
+  flex:1;
+  min-width:0;
+  padding:13px;
+  border:1px solid #ddd3e7;
+  border-radius:9px;
+  font-size:15px;
+  outline:none;
+}
+.search-form button{
+  border:0;
+  border-radius:9px;
+  padding:12px 19px;
+  color:white;
+  background:var(--purple);
+  font-size:14px;
+  cursor:pointer;
+}
+.search-form button:hover{background:var(--purple2)}
+.result{display:none}
+.order-info{
+  background:#f7f3fa;
+  padding:17px;
+  border-radius:11px;
+  margin-bottom:23px;
+  line-height:2;
+}
+.order-number{color:var(--purple);font-weight:bold}
+.status-title{color:var(--purple);margin-bottom:20px}
+.timeline{position:relative;padding-right:12px}
+.step{
+  position:relative;
+  display:flex;
+  gap:15px;
+  padding-bottom:27px;
+}
+.step:not(:last-child)::before{
+  content:"";
+  position:absolute;
+  right:14px;
+  top:31px;
+  width:2px;
+  height:calc(100% - 24px);
+  background:#e6dfec;
+}
+.circle{
+  width:30px;
+  height:30px;
+  flex-shrink:0;
+  border-radius:50%;
+  background:#eee9f3;
+  color:#999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  z-index:1;
+  font-size:14px;
+}
+.step.done .circle{
+  background:var(--purple);
+  color:white;
+}
+.step.current .circle{
+  background:#fff1d2;
+  color:#9b6c16;
+  border:2px solid var(--gold);
+}
+.step-content h3{font-size:15px;margin:5px 0;color:#888}
+.step-content p{font-size:12px;color:#aaa;margin:5px 0}
+.step.done h3,.step.current h3{color:var(--purple)}
+.step.current h3{font-weight:bold}
+.notice{
+  background:#fff8e9;
+  border:1px solid #f0dfb6;
+  color:#795c24;
+  border-radius:9px;
+  padding:13px;
+  font-size:13px;
+  line-height:1.8;
+}
+.error{
+  display:none;
+  color:#9b6c16;
+  background:#fff8e9;
+  padding:13px;
+  border-radius:9px;
+  margin-top:15px;
+  font-size:13px;
+}
+footer{text-align:center;color:#999;padding:25px;font-size:13px}
+@media(max-width:500px){
+  .search-form{flex-direction:column}
+  .search-form button{width:100%}
+  .card{padding:18px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">مشروعي <span>✦</span></div>
+  <a href="index.html">الرئيسية</a>
+</header>
+
+<main class="container">
+
+  <div class="heading">
+    <h1>متابعة طلبك</h1>
+    <p>تابع مراحل تجهيز طلبك خطوة بخطوة.</p>
+  </div>
+
+  <section class="card">
+    <h2>🔎 أدخل رقم الطلب</h2>
+    <form class="search-form" id="searchForm">
+      <input id="orderNumber" type="text"
+        placeholder="مثال: MACH-20261110-123456"
+        required maxlength="50">
+      <button type="submit">متابعة الطلب</button>
+    </form>
+    <div class="error" id="error">
+      لم يتم العثور على طلب تجريبي بهذا الرقم.
+      سيتم تفعيل البحث عن الطلبات الحقيقية لاحقاً.
+    </div>
+  </section>
+
+  <section class="card result" id="result">
+    <div class="order-info">
+      <div>رقم الطلب: <span class="order-number" id="displayNumber"></span></div>
+      <div>حالة الطلب: <strong id="statusText">تم استلام الطلب</strong></div>
+    </div>
+
+    <h2 class="status-title">مراحل الطلب</h2>
+
+    <div class="timeline" id="timeline">
+
+      <div class="step done">
+        <div class="circle">✓</div>
+        <div class="step-content">
+          <h3>تم استلام الطلب</h3>
+          <p>وصل طلبك إلى صاحب المشروع.</p>
+        </div>
+      </div>
+
+      <div class="step current">
+        <div class="circle">2</div>
+        <div class="step-content">
+          <h3>في انتظار التأكيد</h3>
+          <p>سيقوم صاحب المشروع بمراجعة طلبك.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="circle">3</div>
+        <div class="step-content">
+          <h3>تم قبول الطلب</h3>
+          <p>تمت الموافقة على طلبك.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="circle">4</div>
+        <div class="step-content">
+          <h3>قيد التحضير</h3>
+          <p>صاحب المشروع يجهز طلبك.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="circle">5</div>
+        <div class="step-content">
+          <h3>جاهز للتسليم</h3>
+          <p>طلبك جاهز للتسليم أو التوصيل.</p>
+        </div>
+      </div>
+
+      <div class="step">
+        <div class="circle">6</div>
+        <div class="step-content">
+          <h3>تم إكمال الطلب</h3>
+          <p>شكراً لثقتك بمشروعي.</p>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="notice">
+      ℹ️ هذه واجهة تجريبية فقط. تحديث حالة الطلب تلقائياً
+      والبحث عن الطلبات الحقيقية سيتاح بعد ربط قاعدة البيانات.
+    </div>
+  </section>
+
+</main>
+
+<footer>مشروعي © 2026 — منصة تجمع المشاريع الجزائرية</footer>
+
+<script>
+document.getElementById("searchForm").addEventListener("submit",function(event){
+  event.preventDefault();
+
+  const number=document.getElementById("orderNumber").value.trim();
+
+  document.getElementById("result").style.display="none";
+  document.getElementById("error").style.display="block";
+
+  if(!number)return;
+
+  document.getElementById("displayNumber").textContent=number;
+});
+</script>
+
+</body>
+</html>
