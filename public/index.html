@@ -1,0 +1,343 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#452078">
+  <title>مشروعي | MACHROUI</title>
+  <style>
+    :root {
+      --purple: #452078;
+      --purple2: #6e35a0;
+      --gold: #c99732;
+      --bg: #faf8fc;
+      --white: #fff;
+      --text: #292333;
+      --muted: #777181;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.7;
+    }
+
+    button, a { font: inherit; }
+    a { text-decoration: none; color: inherit; }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #eee8f4;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+
+    .nav {
+      max-width: 1150px;
+      margin: auto;
+      padding: 15px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .logo {
+      color: var(--purple);
+      font-size: 25px;
+      font-weight: 900;
+    }
+
+    .logo span { color: var(--gold); }
+
+    .nav-actions { display: flex; gap: 10px; align-items: center; }
+
+    .btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 18px;
+      cursor: pointer;
+      font-weight: bold;
+      display: inline-block;
+    }
+
+    .btn-primary { background: var(--purple); color: white; }
+    .btn-outline { background: white; color: var(--purple); border: 1px solid var(--purple); }
+
+    .hero {
+      background: linear-gradient(125deg, #452078, #7043a0);
+      color: white;
+      padding: 75px 20px;
+      overflow: hidden;
+    }
+
+    .hero-inner {
+      max-width: 1100px;
+      margin: auto;
+      display: grid;
+      grid-template-columns: 1.3fr .7fr;
+      align-items: center;
+      gap: 35px;
+    }
+
+    .hero h1 { font-size: clamp(30px, 5vw, 48px); line-height: 1.4; margin-bottom: 15px; }
+    .hero h1 span { color: #f2cc76; }
+    .hero p { color: #eee5f7; font-size: 17px; max-width: 600px; margin-bottom: 25px; }
+
+    .hero-art {
+      border: 1px solid #ffffff35;
+      background: #ffffff12;
+      border-radius: 25px;
+      padding: 35px 20px;
+      text-align: center;
+    }
+
+    .hero-art .symbol { font-size: 85px; }
+    .hero-art strong { display: block; font-size: 22px; color: #f2cc76; }
+
+    .section {
+      max-width: 1150px;
+      margin: auto;
+      padding: 55px 20px;
+    }
+
+    .section-heading { margin-bottom: 25px; }
+    .section-heading h2 { color: var(--purple); font-size: 27px; }
+    .section-heading p { color: var(--muted); }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 15px;
+    }
+
+    .category {
+      background: white;
+      border: 1px solid #eee8f4;
+      border-radius: 15px;
+      padding: 22px 12px;
+      text-align: center;
+      cursor: pointer;
+      transition: .2s;
+    }
+
+    .category:hover {
+      transform: translateY(-4px);
+      border-color: var(--gold);
+    }
+
+    .category .emoji { font-size: 32px; display: block; margin-bottom: 8px; }
+    .category strong { color: var(--purple); }
+
+    .products {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+
+    .product {
+      background: white;
+      border: 1px solid #eee8f4;
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .product-picture {
+      min-height: 155px;
+      background: linear-gradient(135deg, #eee4f7, #fff4dc);
+      display: grid;
+      place-items: center;
+      font-size: 65px;
+    }
+
+    .product-info { padding: 16px; }
+    .product-info h3 { color: var(--purple); margin-bottom: 5px; }
+    .product-info p { color: var(--muted); font-size: 14px; }
+    .price { color: #95680f; font-weight: bold; margin: 10px 0; }
+
+    .seller-banner {
+      background: #fff;
+      border: 1px solid #eadcf4;
+      border-right: 5px solid var(--gold);
+      border-radius: 16px;
+      padding: 28px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .seller-banner h2 { color: var(--purple); margin-bottom: 5px; }
+    .seller-banner p { color: var(--muted); }
+
+    footer {
+      background: #321653;
+      color: #eee5f7;
+      text-align: center;
+      padding: 25px 15px;
+      margin-top: 30px;
+    }
+
+    footer strong { color: #f2cc76; }
+
+    .notice {
+      background: #fff8e8;
+      color: #78571b;
+      border: 1px solid #f0dfb6;
+      border-radius: 10px;
+      padding: 12px;
+      margin-top: 18px;
+      font-size: 13px;
+    }
+
+    @media (max-width: 700px) {
+      .hero-inner { grid-template-columns: 1fr; }
+      .hero { padding: 48px 18px; }
+      .hero-art { display: none; }
+      .categories { grid-template-columns: repeat(2, 1fr); }
+      .products { grid-template-columns: 1fr 1fr; }
+      .seller-banner { flex-direction: column; align-items: flex-start; }
+      .nav { padding: 12px; }
+      .logo { font-size: 21px; }
+      .nav-actions { gap: 6px; }
+      .nav-actions .btn { padding: 8px 10px; font-size: 13px; }
+    }
+
+    @media (max-width: 400px) {
+      .products { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <nav class="nav">
+    <a href="#" class="logo">مشروعي <span>| MACHROUI</span></a>
+    <div class="nav-actions">
+      <a href="stores.html" class="btn btn-outline">تصفح المنتجات</a>
+      <button class="btn btn-primary" onclick="sellerInfo()">ابدأ مشروعك</button>
+    </div>
+  </nav>
+</header>
+
+<main>
+  <section class="hero">
+    <div class="hero-inner">
+      <div>
+        <h1>مشروعك يستحق أن <span>يراه الجميع</span></h1>
+        <p>
+          اكتشف منتجات أصحاب المشاريع والمحلات في الجزائر،
+          أو اعرض منتجاتك وابدأ في استقبال طلبات زبائنك من مكان واحد.
+        </p>
+        <a href="stores.html" class="btn" style="background:#e5bd65;color:#321653">اكتشف المنتجات ←</a>
+        <button class="btn btn-outline" style="margin-right:8px" onclick="sellerInfo()">أنا صاحب مشروع</button>
+      </div>
+      <div class="hero-art">
+        <div class="symbol">🛍️</div>
+        <strong>من فكرتك إلى زبائنك</strong>
+        <p>مساحة واحدة لمشاريع الجزائر</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="categories">
+    <div class="section-heading">
+      <h2>اكتشف حسب التصنيف</h2>
+      <p>مجموعة متنوعة من المنتجات والخدمات</p>
+    </div>
+
+    <div class="categories">
+      <div class="category" onclick="filterProducts('الحلويات والمأكولات')"><span class="emoji">🍰</span><strong>الحلويات والمأكولات</strong></div>
+      <div class="category" onclick="filterProducts('الملابس والخياطة')"><span class="emoji">👗</span><strong>الملابس والخياطة</strong></div>
+      <div class="category" onclick="filterProducts('العطور والتجميل')"><span class="emoji">🌸</span><strong>العطور والتجميل</strong></div>
+      <div class="category" onclick="filterProducts('الهدايا والتغليف')"><span class="emoji">🎁</span><strong>الهدايا والتغليف</strong></div>
+      <div class="category" onclick="filterProducts('الصناعات التقليدية')"><span class="emoji">🧵</span><strong>الصناعات التقليدية</strong></div>
+      <div class="category" onclick="filterProducts('الإلكترونيات')"><span class="emoji">📱</span><strong>الإلكترونيات</strong></div>
+      <div class="category" onclick="filterProducts('الأثاث والمنزل')"><span class="emoji">🏠</span><strong>الأثاث والمنزل</strong></div>
+      <div class="category" onclick="filterProducts('خدمات متنوعة')"><span class="emoji">✨</span><strong>خدمات متنوعة</strong></div>
+    </div>
+  </section>
+
+  <section class="section" id="products">
+    <div class="section-heading">
+      <h2>اكتشف منتجات مميزة</h2>
+      <p>أمثلة توضيحية لشكل المنتجات التي ستُعرض في المنصة</p>
+    </div>
+
+    <div class="products" id="productList">
+      <article class="product" data-category="الحلويات والمأكولات">
+        <div class="product-picture">🎂</div>
+        <div class="product-info">
+          <h3>حلويات منزلية</h3>
+          <p>صناعة منزلية بعناية وجودة</p>
+          <div class="price">السعر يحدده صاحب المشروع</div>
+          <button class="btn btn-primary" onclick="demoOrder()">اطلب الآن</button>
+        </div>
+      </article>
+
+      <article class="product" data-category="الملابس والخياطة">
+        <div class="product-picture">👗</div>
+        <div class="product-info">
+          <h3>ملابس وخياطة</h3>
+          <p>تصاميم متنوعة حسب الطلب</p>
+          <div class="price">السعر يحدده صاحب المشروع</div>
+          <button class="btn btn-primary" onclick="demoOrder()">اطلب الآن</button>
+        </div>
+      </article>
+
+      <article class="product" data-category="الهدايا والتغليف">
+        <div class="product-picture">🎁</div>
+        <div class="product-info">
+          <h3>هدايا مميزة</h3>
+          <p>أفكار جميلة للمناسبات</p>
+          <div class="price">السعر يحدده صاحب المشروع</div>
+          <button class="btn btn-primary" onclick="demoOrder()">اطلب الآن</button>
+        </div>
+      </article>
+    </div>
+    <p class="notice">هذه منتجات تجريبية للعرض فقط. سنربط المنتجات الحقيقية بحسابات أصحاب المشاريع لاحقاً.</p>
+  </section>
+
+  <section class="section">
+    <div class="seller-banner">
+      <div>
+        <h2>هل لديك مشروع أو متجر؟</h2>
+        <p>أنشئ مساحتك الخاصة واعرض منتجاتك واستقبل طلبات الزبائن.</p>
+      </div>
+      <button class="btn btn-primary" onclick="sellerInfo()">سجّل مشروعك الآن</button>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <strong>مشروعي | MACHROUI</strong>
+  <p>منصة تجمع المشاريع الجزائرية وتقرّبها من زبائنها 🇩🇿</p>
+  <small>© 2026 جميع الحقوق محفوظة</small>
+</footer>
+
+<script>
+  function sellerInfo() {
+  window.location.href = "register.html";
+}
+
+  function demoOrder() {
+    alert("هذه تجربة للواجهة فقط. سنضيف نظام الطلبات الحقيقي في المرحلة القادمة.");
+  }
+
+  function filterProducts(category) {
+    const products = document.querySelectorAll(".product");
+    products.forEach(product => {
+      product.style.display =
+        product.dataset.category === category ? "block" : "none";
+    });
+    document.getElementById("products").scrollIntoView({ behavior: "smooth" });
+  }
+</script>
+
+</body>
+</html>
