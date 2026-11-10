@@ -5,42 +5,13 @@ const express = require("express");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { Pool } = require("pg");
+
 const authRoutes = require("./routes/auth");
 const catalogRoutes = require("./routes/catalog");
 const sellerRoutes = require("./routes/seller");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
-
-// إعدادات الحماية الأساسية
-app.use(helmet());
-app.use(express.json({ limit: "1mb" }));
-// حماية إضافية لمسارات الحسابات
-app.use(
-  "/api/auth",
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 30,
-    standardHeaders: "draft-7",
-    legacyHeaders: false
-  })
-);
-
-// ربط نظام التسجيل والدخول
-app.use("/api/auth", authRoutes);
-// ربط واجهة المتاجر والمنتجات
-app.use("/api/catalog", catalogRoutes);
-app.use("/api/seller", sellerRoutes);
-// تحديد عدد الطلبات لحماية الخادم
-app.use(
-  "/api/",
-  rateLimit({
-    windowMs: 15 * 60 * 1000,
-    limit: 200,
-    standardHeaders: "draft-7",
-    legacyHeaders: false
-  })
-);
 
 // الاتصال بقاعدة البيانات عند توفير DATABASE_URL
 const pool = process.env.DATABASE_URL
@@ -54,7 +25,43 @@ const pool = process.env.DATABASE_URL
       connectionTimeoutMillis: 10000
     })
   : null;
+
 app.locals.pool = pool;
+
+// إعدادات الحماية الأساسية
+app.use(helmet());
+app.use(express.json({ limit: "1mb" }));
+
+// حماية عامة لجميع مسارات API
+app.use(
+  "/api/",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 200,
+    standardHeaders: "draft-7",
+    legacyHeaders: false
+  })
+);
+
+// حماية إضافية لمسارات الحسابات
+app.use(
+  "/api/auth",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 30,
+    standardHeaders: "draft-7",
+    legacyHeaders: false
+  })
+);
+
+// ربط نظام التسجيل والدخول
+app.use("/api/auth", authRoutes);
+
+// ربط واجهة المتاجر والمنتجات
+app.use("/api/catalog", catalogRoutes);
+
+// ربط لوحة التاجر وإدارة المنتجات
+app.use("/api/seller", sellerRoutes);
 
 // مسار فحص الخادم وقاعدة البيانات
 app.get("/api/health", async (req, res) => {
@@ -70,7 +77,7 @@ app.get("/api/health", async (req, res) => {
     }
   }
 
-  res.status(database === "disconnected" ? 503 : 200).json({
+  return res.status(database === "disconnected" ? 503 : 200).json({
     success: database !== "disconnected",
     application: "MACHROUI",
     server: "running",
@@ -80,7 +87,7 @@ app.get("/api/health", async (req, res) => {
 
 // الصفحة الرئيسية المؤقتة للخادم
 app.get("/api", (req, res) => {
-  res.json({
+  return res.json({
     success: true,
     message: "مرحباً بك في واجهة MACHROUI البرمجية"
   });
@@ -88,7 +95,7 @@ app.get("/api", (req, res) => {
 
 // معالجة المسارات غير الموجودة
 app.use((req, res) => {
-  res.status(404).json({
+  return res.status(404).json({
     success: false,
     message: "المسار المطلوب غير موجود"
   });
@@ -98,7 +105,11 @@ app.use((req, res) => {
 app.use((error, req, res, next) => {
   console.error("Server error:", error.message);
 
-  res.status(500).json({
+  if (res.headersSent) {
+    return next(error);
+  }
+
+  return res.status(500).json({
     success: false,
     message: "حدث خطأ داخلي في الخادم"
   });
@@ -114,11 +125,16 @@ async function shutdown() {
   console.log("Shutting down MACHROUI server...");
 
   server.close(async () => {
-    if (pool) {
-      await pool.end();
-    }
+    try {
+      if (pool) {
+        await pool.end();
+      }
 
-    process.exit(0);
+      process.exit(0);
+    } catch (error) {
+      console.error("Shutdown error:", error.message);
+      process.exit(1);
+    }
   });
 }
 
