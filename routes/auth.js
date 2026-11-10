@@ -9,8 +9,10 @@ const {
   hashSessionToken
 } = require("../utils/security");
 
-const { validateRegistration, normalizePhone } =
-  require("../utils/validation");
+const {
+  validateRegistration,
+  normalizePhone
+} = require("../utils/validation");
 
 const { requireAuth } = require("../middleware/auth");
 
@@ -18,6 +20,7 @@ const router = express.Router();
 
 const SESSION_DURATION = 30 * 24 * 60 * 60 * 1000;
 
+// إنشاء ملف تعريف الارتباط للجلسة
 function setSessionCookie(res, token) {
   const production = process.env.NODE_ENV === "production";
 
@@ -34,6 +37,7 @@ function setSessionCookie(res, token) {
   );
 }
 
+// حذف ملف تعريف الارتباط
 function clearSessionCookie(res) {
   const production = process.env.NODE_ENV === "production";
 
@@ -50,6 +54,7 @@ function clearSessionCookie(res) {
   );
 }
 
+// استخراج رمز الجلسة
 function getCookieToken(req) {
   const cookies = (req.headers.cookie || "").split(";");
 
@@ -60,7 +65,9 @@ function getCookieToken(req) {
 
     if (cookie.slice(0, separator).trim() === "machroui_session") {
       try {
-        return decodeURIComponent(cookie.slice(separator + 1).trim());
+        return decodeURIComponent(
+          cookie.slice(separator + 1).trim()
+        );
       } catch {
         return null;
       }
@@ -72,7 +79,9 @@ function getCookieToken(req) {
 
 // تسجيل تاجر جديد
 router.post("/register", async (req, res) => {
-  if (!req.app.locals.pool) {
+  const pool = req.app.locals.pool;
+
+  if (!pool) {
     return res.status(503).json({
       success: false,
       message: "قاعدة البيانات غير متصلة حالياً"
@@ -89,11 +98,40 @@ router.post("/register", async (req, res) => {
   }
 
   const data = validation.data;
-  const pool = req.app.locals.pool;
-  const client = await pool.connect();
+
+  let client;
+  let transactionStarted = false;
 
   try {
+    client = await pool.connect();
+
     await client.query("BEGIN");
+    transactionStarted = true;
+
+    // البحث عن التصنيف في جدول التصنيفات
+    const categoryResult = await client.query(
+      `SELECT id
+       FROM categories
+       WHERE is_active = TRUE
+         AND (
+           slug = $1
+           OR name = $1
+         )
+       LIMIT 1`,
+      [data.category]
+    );
+
+    if (categoryResult.rows.length === 0) {
+      await client.query("ROLLBACK");
+      transactionStarted = false;
+
+      return res.status(400).json({
+        success: false,
+        message: "التصنيف المختار غير متوفر حالياً"
+      });
+    }
+
+    const categoryId = categoryResult.rows[0].id;
 
     const passwordHash = await hashPassword(data.password);
 
@@ -102,28 +140,44 @@ router.post("/register", async (req, res) => {
         (full_name, phone, password_hash, role, account_status)
        VALUES ($1, $2, $3, 'seller', 'pending')
        RETURNING id`,
-      [data.fullName, data.phone, passwordHash]
+      [
+        data.fullName,
+        data.phone,
+        passwordHash
+      ]
     );
 
     const userId = userResult.rows[0].id;
 
+    // إنشاء رابط مميز للمتجر
     const baseSlug = data.projectName
       .toLowerCase()
       .replace(/[^\p{L}\p{N}]+/gu, "-")
       .replace(/^-|-$/g, "")
       .slice(0, 60) || "store";
 
-    const slug = `${baseSlug}-${crypto.randomBytes(4).toString("hex")}`;
+    const slug =
+      `${baseSlug}-${crypto.randomBytes(4).toString("hex")}`;
 
+    // إنشاء المتجر وربطه بالتصنيف الصحيح
     await client.query(
       `INSERT INTO stores
-        (owner_user_id, name, slug, category, wilaya, commune, phone, store_status)
+        (
+          owner_user_id,
+          name,
+          slug,
+          category_id,
+          wilaya,
+          commune,
+          phone,
+          store_status
+        )
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')`,
       [
         userId,
         data.projectName,
         slug,
-        data.category,
+        categoryId,
         data.wilaya,
         data.commune,
         data.phone
@@ -131,13 +185,21 @@ router.post("/register", async (req, res) => {
     );
 
     await client.query("COMMIT");
+    transactionStarted = false;
 
     return res.status(201).json({
       success: true,
       message: "تم استلام طلب التسجيل، حسابك ينتظر موافقة الإدارة"
     });
+
   } catch (error) {
-    await client.query("ROLLBACK");
+    if (client && transactionStarted) {
+      try {
+        await client.query("ROLLBACK");
+      } catch (rollbackError) {
+        console.error("Registration rollback error:", rollbackError.message);
+      }
+    }
 
     if (error.code === "23505") {
       return res.status(409).json({
@@ -152,8 +214,11 @@ router.post("/register", async (req, res) => {
       success: false,
       message: "تعذر إتمام التسجيل حالياً"
     });
+
   } finally {
-    client.release();
+    if (client) {
+      client.release();
+    }
   }
 });
 
@@ -171,7 +236,11 @@ router.post("/login", async (req, res) => {
   const phone = normalizePhone(req.body?.phone);
   const password = req.body?.password;
 
-  if (!phone || typeof password !== "string" || password.length > 128) {
+  if (
+    !phone ||
+    typeof password !== "string" ||
+    password.length > 128
+  ) {
     return res.status(400).json({
       success: false,
       message: "رقم الهاتف أو كلمة المرور غير صحيحة"
@@ -180,7 +249,13 @@ router.post("/login", async (req, res) => {
 
   try {
     const result = await pool.query(
-      `SELECT id, full_name, phone, password_hash, role, account_status
+      `SELECT
+         id,
+         full_name,
+         phone,
+         password_hash,
+         role,
+         account_status
        FROM users
        WHERE phone = $1
        LIMIT 1`,
@@ -189,7 +264,10 @@ router.post("/login", async (req, res) => {
 
     const user = result.rows[0];
 
-    if (!user || !(await verifyPassword(password, user.password_hash))) {
+    if (
+      !user ||
+      !(await verifyPassword(password, user.password_hash))
+    ) {
       return res.status(401).json({
         success: false,
         message: "رقم الهاتف أو كلمة المرور غير صحيحة"
@@ -211,7 +289,8 @@ router.post("/login", async (req, res) => {
     const expiresAt = new Date(Date.now() + SESSION_DURATION);
 
     await pool.query(
-      `INSERT INTO user_sessions (user_id, token_hash, expires_at)
+      `INSERT INTO user_sessions
+        (user_id, token_hash, expires_at)
        VALUES ($1, $2, $3)`,
       [user.id, tokenHash, expiresAt]
     );
@@ -228,6 +307,7 @@ router.post("/login", async (req, res) => {
         role: user.role
       }
     });
+
   } catch (error) {
     console.error("Login error:", error.message);
 
@@ -239,19 +319,23 @@ router.post("/login", async (req, res) => {
 });
 
 // معلومات الحساب الحالي
-router.get("/me", (req, res, next) => {
-  return requireAuth(req.app.locals.pool)(req, res, next);
-}, (req, res) => {
-  res.json({
-    success: true,
-    user: {
-      id: req.user.id,
-      fullName: req.user.full_name,
-      phone: req.user.phone,
-      role: req.user.role
-    }
-  });
-});
+router.get(
+  "/me",
+  (req, res, next) => {
+    return requireAuth(req.app.locals.pool)(req, res, next);
+  },
+  (req, res) => {
+    return res.json({
+      success: true,
+      user: {
+        id: req.user.id,
+        fullName: req.user.full_name,
+        phone: req.user.phone,
+        role: req.user.role
+      }
+    });
+  }
+);
 
 // تسجيل الخروج
 router.post("/logout", async (req, res) => {
@@ -261,7 +345,8 @@ router.post("/logout", async (req, res) => {
   try {
     if (pool && token) {
       await pool.query(
-        "DELETE FROM user_sessions WHERE token_hash = $1",
+        `DELETE FROM user_sessions
+         WHERE token_hash = $1`,
         [hashSessionToken(token)]
       );
     }
@@ -272,6 +357,7 @@ router.post("/logout", async (req, res) => {
       success: true,
       message: "تم تسجيل الخروج"
     });
+
   } catch (error) {
     console.error("Logout error:", error.message);
 
