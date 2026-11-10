@@ -3,6 +3,8 @@ function cleanText(value, maxLength = 100) {
   if (typeof value !== "string") return "";
 
   return value
+    .normalize("NFC")
+    .replace(/\p{Cc}/gu, "")
     .trim()
     .replace(/\s+/g, " ")
     .slice(0, maxLength);
@@ -23,8 +25,15 @@ function normalizePhone(value) {
 }
 
 function validateRegistration(data) {
-  if (!data || typeof data !== "object" || Array.isArray(data)) {
-    return { valid: false, message: "بيانات التسجيل غير صحيحة" };
+  if (
+    !data ||
+    typeof data !== "object" ||
+    Array.isArray(data)
+  ) {
+    return {
+      valid: false,
+      message: "بيانات التسجيل غير صحيحة"
+    };
   }
 
   const fullName = cleanText(data.fullName, 80);
@@ -36,22 +45,45 @@ function validateRegistration(data) {
   const password = data.password;
 
   if (fullName.length < 3) {
-    return { valid: false, message: "يرجى إدخال الاسم الكامل" };
+    return {
+      valid: false,
+      message: "يرجى إدخال الاسم الكامل"
+    };
   }
 
   if (projectName.length < 2) {
-    return { valid: false, message: "يرجى إدخال اسم المشروع" };
+    return {
+      valid: false,
+      message: "يرجى إدخال اسم المشروع"
+    };
   }
 
   if (!phone) {
-    return { valid: false, message: "رقم الهاتف غير صحيح" };
+    return {
+      valid: false,
+      message: "رقم الهاتف غير صحيح"
+    };
   }
 
-  if (!wilaya || !commune || !category) {
-    return { valid: false, message: "يرجى إكمال معلومات المشروع" };
+  if (!wilaya || !commune) {
+    return {
+      valid: false,
+      message: "يرجى إدخال الولاية والبلدية"
+    };
   }
 
-  if (typeof password !== "string" || password.length < 8 || password.length > 128) {
+  if (category.length < 2) {
+    return {
+      valid: false,
+      message: "يرجى اختيار تصنيف المشروع"
+    };
+  }
+
+  if (
+    typeof password !== "string" ||
+    password.length < 8 ||
+    password.length > 128
+  ) {
     return {
       valid: false,
       message: "كلمة المرور يجب أن تكون بين 8 و128 حرفاً"
