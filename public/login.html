@@ -1,0 +1,270 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#452078">
+  <title>تسجيل الدخول | مشروعي</title>
+
+  <style>
+    :root {
+      --purple: #452078;
+      --purple2: #6e35a0;
+      --gold: #c99732;
+      --bg: #faf8fc;
+      --muted: #777181;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: #30283a;
+      min-height: 100vh;
+    }
+
+    header {
+      background: white;
+      border-bottom: 1px solid #eee8f4;
+      padding: 16px 20px;
+    }
+
+    .logo {
+      max-width: 1050px;
+      margin: auto;
+      font-size: 24px;
+      font-weight: 900;
+      color: var(--purple);
+    }
+
+    .logo span { color: var(--gold); }
+
+    main {
+      min-height: 85vh;
+      display: grid;
+      place-items: center;
+      padding: 30px 15px;
+    }
+
+    .login-card {
+      width: 100%;
+      max-width: 450px;
+      padding: 35px 30px;
+      background: white;
+      border: 1px solid #eee8f4;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px #4520780d;
+    }
+
+    .heading { text-align: center; margin-bottom: 30px; }
+
+    .heading .icon { font-size: 52px; }
+
+    .heading h1 {
+      color: var(--purple);
+      font-size: 27px;
+      margin: 10px 0;
+    }
+
+    .heading p { color: var(--muted); font-size: 14px; }
+
+    .field { margin-bottom: 20px; }
+
+    label {
+      display: block;
+      color: var(--purple);
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    input {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #e5ddec;
+      border-radius: 10px;
+      outline: none;
+      font-family: inherit;
+      font-size: 14px;
+    }
+
+    input:focus {
+      border-color: var(--purple2);
+      box-shadow: 0 0 0 3px #6e35a015;
+    }
+
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-left: 48px; }
+
+    .show-password {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      font-size: 19px;
+      cursor: pointer;
+    }
+
+    .submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--purple);
+      color: white;
+      border: none;
+      border-radius: 11px;
+      font-family: inherit;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 5px;
+    }
+
+    .submit:hover { background: var(--purple2); }
+
+    .links {
+      display: flex;
+      justify-content: space-between;
+      gap: 10px;
+      margin-top: 20px;
+      font-size: 13px;
+    }
+
+    .links a { color: var(--purple2); font-weight: bold; }
+
+    .message {
+      display: none;
+      padding: 12px;
+      margin-top: 17px;
+      border-radius: 9px;
+      background: #fff5e2;
+      color: #79571a;
+      font-size: 13px;
+      line-height: 1.7;
+    }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 25px;
+      color: var(--muted);
+      text-decoration: none;
+      font-size: 13px;
+    }
+
+    footer {
+      text-align: center;
+      padding: 18px;
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    @media (max-width: 480px) {
+      .login-card { padding: 28px 20px; }
+      .heading h1 { font-size: 24px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">مشروعي <span>| MACHROUI</span></div>
+</header>
+
+<main>
+  <section class="login-card">
+
+    <div class="heading">
+      <div class="icon">🔐</div>
+      <h1>مرحباً بعودتك</h1>
+      <p>سجّل الدخول لإدارة مشروعك وطلبات زبائنك</p>
+    </div>
+
+    <form id="loginForm">
+
+      <div class="field">
+        <label for="phone">رقم الهاتف</label>
+        <input
+          type="tel"
+          id="phone"
+          placeholder="أدخل رقم الهاتف المسجل"
+          maxlength="10"
+          inputmode="numeric"
+          pattern="0[567][0-9]{8}"
+          required
+        >
+      </div>
+
+      <div class="field">
+        <label for="password">كلمة المرور</label>
+        <div class="password-wrap">
+          <input
+            type="password"
+            id="password"
+            placeholder="أدخل كلمة المرور"
+            required
+          >
+          <button
+            type="button"
+            class="show-password"
+            onclick="togglePassword()"
+          >👁</button>
+        </div>
+      </div>
+
+      <button type="submit" class="submit">
+        تسجيل الدخول
+      </button>
+
+      <div class="message" id="message"></div>
+
+    </form>
+
+    <div class="links">
+      <a href="register.html">إنشاء حساب جديد</a>
+      <a href="#" onclick="forgotPassword(event)">نسيت كلمة المرور؟</a>
+    </div>
+
+    <a href="index.html" class="back">← العودة إلى الصفحة الرئيسية</a>
+
+  </section>
+</main>
+
+<footer>
+  مشروعي | MACHROUI — منصتك لدعم المشاريع الجزائرية 🇩🇿
+</footer>
+
+<script>
+  function togglePassword() {
+    const input = document.getElementById("password");
+    const button = document.querySelector(".show-password");
+
+    input.type = input.type === "password" ? "text" : "password";
+    button.textContent = input.type === "password" ? "👁" : "🙈";
+  }
+
+  function forgotPassword(event) {
+    event.preventDefault();
+    showMessage("استرجاع كلمة المرور سيكون متاحاً بعد ربط نظام الحسابات.");
+  }
+
+  function showMessage(text) {
+    const message = document.getElementById("message");
+    message.textContent = text;
+    message.style.display = "block";
+  }
+
+  document.getElementById("loginForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+    showMessage(
+      "واجهة تسجيل الدخول جاهزة. سنربطها بنظام الحسابات الآمن في المرحلة القادمة."
+    );
+  });
+</script>
+
+</body>
+</html>
