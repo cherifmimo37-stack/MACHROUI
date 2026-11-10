@@ -1,0 +1,696 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#452078">
+<title>لوحة التحكم | مشروعي</title>
+
+<style>
+:root {
+  --purple:#452078;
+  --purple2:#6e35a0;
+  --gold:#c99732;
+  --bg:#f8f6fa;
+  --white:#fff;
+  --text:#30283a;
+  --muted:#81798a;
+  --border:#eee8f4;
+}
+
+* {box-sizing:border-box;margin:0;padding:0}
+
+body {
+  font-family:Tahoma,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+
+button,input,select,textarea {font-family:inherit}
+
+.layout {
+  display:flex;
+  min-height:100vh;
+}
+
+.sidebar {
+  width:245px;
+  background:var(--purple);
+  color:white;
+  padding:25px 15px;
+  flex-shrink:0;
+}
+
+.brand {
+  text-align:center;
+  font-size:23px;
+  font-weight:900;
+  padding:10px 0 28px;
+  border-bottom:1px solid #ffffff25;
+}
+
+.brand span {color:#e5bd65}
+
+.menu {margin-top:25px}
+
+.menu button {
+  display:block;
+  width:100%;
+  border:0;
+  background:transparent;
+  color:#eee5f7;
+  padding:14px 13px;
+  text-align:right;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:14px;
+  margin-bottom:7px;
+}
+
+.menu button.active,
+.menu button:hover {
+  background:#ffffff19;
+  color:#f2cc76;
+}
+
+.menu .logout {
+  margin-top:35px;
+  border:1px solid #ffffff40;
+}
+
+.main {
+  flex:1;
+  min-width:0;
+  padding:25px;
+}
+
+.topbar {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  margin-bottom:27px;
+}
+
+.topbar h1 {
+  font-size:24px;
+  color:var(--purple);
+}
+
+.topbar p {font-size:13px;color:var(--muted)}
+
+.profile {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  background:white;
+  border:1px solid var(--border);
+  padding:9px 14px;
+  border-radius:12px;
+}
+
+.avatar {
+  width:38px;
+  height:38px;
+  border-radius:50%;
+  display:grid;
+  place-items:center;
+  background:#f1e7fa;
+  font-size:20px;
+}
+
+.profile strong {font-size:13px;color:var(--purple)}
+
+.page {display:none}
+.page.active {display:block}
+
+.welcome {
+  background:linear-gradient(120deg,var(--purple),var(--purple2));
+  color:white;
+  padding:25px;
+  border-radius:17px;
+  margin-bottom:23px;
+}
+
+.welcome h2 {font-size:22px;margin-bottom:7px}
+.welcome p {font-size:14px;color:#eee5f7}
+
+.stats {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:15px;
+  margin-bottom:25px;
+}
+
+.stat {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:19px;
+}
+
+.stat .symbol {font-size:25px}
+.stat h3 {font-size:25px;color:var(--purple);margin:8px 0}
+.stat p {font-size:13px;color:var(--muted)}
+
+.panel {
+  background:white;
+  border:1px solid var(--border);
+  border-radius:15px;
+  padding:21px;
+  margin-bottom:20px;
+}
+
+.panel-head {
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+  margin-bottom:18px;
+}
+
+.panel h2 {font-size:18px;color:var(--purple)}
+
+.btn {
+  border:0;
+  padding:10px 15px;
+  border-radius:9px;
+  background:var(--purple);
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.btn:hover {background:var(--purple2)}
+.btn-gold {background:var(--gold);color:#fff}
+.btn-light {background:#f1eaf7;color:var(--purple)}
+
+.empty {
+  text-align:center;
+  color:var(--muted);
+  padding:30px 10px;
+  font-size:14px;
+}
+
+.form-grid {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:15px;
+}
+
+.field {margin-bottom:15px}
+.field.full {grid-column:1/-1}
+
+label {
+  display:block;
+  color:var(--purple);
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:7px;
+}
+
+input,select,textarea {
+  width:100%;
+  padding:12px;
+  border:1px solid #e5ddec;
+  border-radius:9px;
+  outline:none;
+  background:white;
+  font-size:14px;
+}
+
+input:focus,select:focus,textarea:focus {border-color:var(--purple2)}
+textarea {resize:vertical;min-height:90px}
+
+.product-list {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+}
+
+.product-card {
+  border:1px solid var(--border);
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.product-card img {
+  width:100%;
+  height:145px;
+  object-fit:cover;
+  background:#f1eaf7;
+}
+
+.product-card .info {padding:13px}
+.product-card h3 {font-size:15px;color:var(--purple)}
+.product-card p {font-size:12px;color:var(--muted);margin:5px 0}
+.product-card .price {font-weight:bold;color:#95680f;margin-bottom:10px}
+
+.product-actions {display:flex;gap:7px}
+.product-actions button {flex:1;font-size:12px;padding:8px}
+
+.order-item {
+  border:1px solid var(--border);
+  border-radius:11px;
+  padding:15px;
+  margin-bottom:12px;
+}
+
+.order-item strong {color:var(--purple)}
+.order-item p {font-size:13px;color:var(--muted);margin-top:5px}
+
+.notice {
+  padding:12px;
+  border-radius:9px;
+  background:#fff7e6;
+  color:#79571a;
+  font-size:13px;
+  margin-bottom:15px;
+}
+
+.badge {
+  display:inline-block;
+  background:#f1eaf7;
+  color:var(--purple);
+  padding:5px 9px;
+  border-radius:20px;
+  font-size:11px;
+}
+
+@media(max-width:950px) {
+  .stats {grid-template-columns:repeat(2,1fr)}
+  .product-list {grid-template-columns:repeat(2,1fr)}
+}
+
+@media(max-width:650px) {
+  .layout {display:block}
+  .sidebar {width:100%;padding:12px}
+  .brand {padding:5px;border:0}
+  .menu {
+    display:flex;
+    overflow-x:auto;
+    gap:6px;
+    margin-top:12px;
+  }
+  .menu button {
+    white-space:nowrap;
+    width:auto;
+    margin:0;
+    padding:10px 12px;
+    font-size:12px;
+  }
+  .menu .logout {margin:0}
+  .main {padding:15px}
+  .topbar {align-items:flex-start}
+  .topbar h1 {font-size:19px}
+  .profile {padding:6px}
+  .profile strong {font-size:11px}
+  .stats {gap:9px}
+  .stat {padding:13px}
+  .stat h3 {font-size:21px}
+  .product-list {grid-template-columns:1fr 1fr}
+  .form-grid {grid-template-columns:1fr}
+  .field.full {grid-column:auto}
+}
+
+@media(max-width:390px) {
+  .product-list {grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<div class="layout">
+
+<aside class="sidebar">
+  <div class="brand">مشروعي <span>| MACHROUI</span></div>
+
+  <nav class="menu">
+    <button class="active" onclick="showPage('home',this)">🏠 الرئيسية</button>
+    <button onclick="showPage('products',this)">📦 منتجاتي</button>
+    <button onclick="showPage('addProduct',this)">➕ إضافة منتج</button>
+    <button onclick="showPage('orders',this)">🛒 الطلبات</button>
+    <button onclick="showPage('settings',this)">⚙️ إعدادات المشروع</button>
+    <button class="logout" onclick="logout()">🚪 تسجيل الخروج</button>
+  </nav>
+</aside>
+
+<main class="main">
+
+  <div class="topbar">
+    <div>
+      <h1 id="pageTitle">لوحة التحكم</h1>
+      <p>إدارة مشروعك ومنتجاتك وطلبات زبائنك</p>
+    </div>
+    <div class="profile">
+      <div class="avatar">🏪</div>
+      <strong id="projectName">مشروعي</strong>
+    </div>
+  </div>
+
+  <!-- الرئيسية -->
+  <section class="page active" id="home">
+
+    <div class="welcome">
+      <h2>مرحباً بك في مساحة مشروعك 👋</h2>
+      <p>هنا يمكنك متابعة منتجاتك وإدارة طلبات زبائنك بسهولة.</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat">
+        <div class="symbol">📦</div>
+        <h3 id="productsCount">0</h3>
+        <p>عدد المنتجات</p>
+      </div>
+
+      <div class="stat">
+        <div class="symbol">🛒</div>
+        <h3 id="ordersCount">0</h3>
+        <p>إجمالي الطلبات</p>
+      </div>
+
+      <div class="stat">
+        <div class="symbol">⏳</div>
+        <h3 id="pendingCount">0</h3>
+        <p>طلبات جديدة</p>
+      </div>
+
+      <div class="stat">
+        <div class="symbol">💰</div>
+        <h3>0 دج</h3>
+        <p>المبيعات التجريبية</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>آخر المنتجات</h2>
+        <button class="btn btn-light" onclick="showPage('products')">عرض الكل</button>
+      </div>
+      <div id="recentProducts" class="empty">لم تتم إضافة منتجات بعد.</div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-head">
+        <h2>آخر الطلبات</h2>
+        <button class="btn btn-light" onclick="showPage('orders')">عرض الكل</button>
+      </div>
+      <div id="recentOrders" class="empty">لا توجد طلبات حالياً.</div>
+    </div>
+
+  </section>
+
+  <!-- المنتجات -->
+  <section class="page" id="products">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>إدارة المنتجات</h2>
+        <button class="btn" onclick="showPage('addProduct')">+ إضافة منتج</button>
+      </div>
+      <div id="productList" class="product-list"></div>
+    </div>
+  </section>
+
+  <!-- إضافة منتج -->
+  <section class="page" id="addProduct">
+    <div class="panel">
+      <div class="panel-head">
+        <h2 id="formTitle">إضافة منتج جديد</h2>
+      </div>
+
+      <div class="notice">
+        هذه نسخة أولية للتجربة. المنتجات تُحفظ مؤقتاً على هذا المتصفح فقط.
+      </div>
+
+      <form id="productForm">
+        <input type="hidden" id="editIndex">
+
+        <div class="form-grid">
+
+          <div class="field">
+            <label for="productName">اسم المنتج *</label>
+            <input id="productName" required maxlength="100"
+                   placeholder="مثال: حلويات تقليدية">
+          </div>
+
+          <div class="field">
+            <label for="productPrice">السعر بالدينار الجزائري *</label>
+            <input id="productPrice" type="number" min="0"
+                   step="1" required placeholder="مثال: 1500">
+          </div>
+
+          <div class="field">
+            <label for="productCategory">التصنيف *</label>
+            <select id="productCategory" required>
+              <option value="">اختر التصنيف</option>
+              <option>الحلويات والمأكولات</option>
+              <option>الملابس والخياطة</option>
+              <option>العطور والتجميل</option>
+              <option>الهدايا والتغليف</option>
+              <option>الصناعات التقليدية</option>
+              <option>الإلكترونيات</option>
+              <option>الأثاث والمنزل</option>
+              <option>خدمات متنوعة</option>
+              <option>أخرى</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="productImage">صورة المنتج</label>
+            <input id="productImage" type="file" accept="image/*">
+          </div>
+
+          <div class="field full">
+            <label for="productDescription">وصف المنتج</label>
+            <textarea id="productDescription"
+                      maxlength="1000"
+                      placeholder="اكتب وصفاً مختصراً للمنتج"></textarea>
+          </div>
+
+        </div>
+
+        <button class="btn" type="submit">حفظ المنتج</button>
+        <button class="btn btn-light" type="button"
+                onclick="resetProductForm()">إلغاء</button>
+      </form>
+    </div>
+  </section>
+
+  <!-- الطلبات -->
+  <section class="page" id="orders">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>طلبات الزبائن</h2>
+        <span class="badge">تجريبية</span>
+      </div>
+      <div class="notice">
+        سيصل الطلب الحقيقي إلى هذه الصفحة مع إشعار لصاحب المشروع بعد ربط الخادم.
+      </div>
+      <div id="orderList" class="empty">لا توجد طلبات حتى الآن.</div>
+    </div>
+  </section>
+
+  <!-- الإعدادات -->
+  <section class="page" id="settings">
+    <div class="panel">
+      <div class="panel-head">
+        <h2>إعدادات المشروع</h2>
+      </div>
+
+      <div class="notice">
+        يمكنك تجربة تعديل اسم المشروع محلياً. سنضيف حفظ البيانات الحقيقي لاحقاً.
+      </div>
+
+      <form id="settingsForm">
+        <div class="field">
+          <label for="settingsProjectName">اسم المشروع</label>
+          <input id="settingsProjectName" maxlength="100"
+                 placeholder="اسم مشروعك">
+        </div>
+
+        <div class="field">
+          <label for="settingsDescription">نبذة عن المشروع</label>
+          <textarea id="settingsDescription" maxlength="500"
+                    placeholder="عرّف الزبائن بمشروعك"></textarea>
+        </div>
+
+        <button class="btn" type="submit">حفظ التعديلات التجريبية</button>
+      </form>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+  // بيانات تجريبية محلية فقط وليست حسابات حقيقية
+  let products = [];
+  let orders = [];
+
+  function showPage(id, button) {
+    document.querySelectorAll(".page").forEach(page => {
+      page.classList.remove("active");
+    });
+
+    document.getElementById(id).classList.add("active");
+
+    document.querySelectorAll(".menu button").forEach(btn => {
+      btn.classList.remove("active");
+    });
+
+    if (button) button.classList.add("active");
+
+    const titles = {
+      home: "لوحة التحكم",
+      products: "منتجاتي",
+      addProduct: "إضافة منتج",
+      orders: "الطلبات",
+      settings: "إعدادات المشروع"
+    };
+
+    document.getElementById("pageTitle").textContent = titles[id] || "مشروعي";
+  }
+
+  function updateDashboard() {
+    document.getElementById("productsCount").textContent = products.length;
+    document.getElementById("ordersCount").textContent = orders.length;
+    document.getElementById("pendingCount").textContent =
+      orders.filter(order => order.status === "جديد").length;
+
+    renderProducts();
+  }
+
+  function renderProducts() {
+    const list = document.getElementById("productList");
+    const recent = document.getElementById("recentProducts");
+
+    if (!products.length) {
+      list.innerHTML = '<div class="empty">لم تتم إضافة منتجات بعد.</div>';
+      recent.textContent = "لم تتم إضافة منتجات بعد.";
+      return;
+    }
+
+    list.innerHTML = products.map((product, index) => `
+      <article class="product-card">
+        <img src="${product.image || ''}" alt="صورة المنتج"
+             style="${product.image ? '' : 'display:none'}">
+        <div class="info">
+          <h3>${escapeHTML(product.name)}</h3>
+          <p>${escapeHTML(product.category)}</p>
+          <div class="price">${Number(product.price).toLocaleString("ar-DZ")} دج</div>
+          <div class="product-actions">
+            <button class="btn btn-light" onclick="editProduct(${index})">تعديل</button>
+            <button class="btn" onclick="deleteProduct(${index})">حذف</button>
+          </div>
+        </div>
+      </article>
+    `).join("");
+
+    recent.innerHTML = products.slice(-3).reverse().map(product =>
+      `<div class="order-item"><strong>${escapeHTML(product.name)}</strong>
+      <p>${Number(product.price).toLocaleString("ar-DZ")} دج</p></div>`
+    ).join("");
+  }
+
+  function escapeHTML(value) {
+    return String(value).replace(/[&<>"']/g, char => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;"
+    })[char]);
+  }
+
+  document.getElementById("productForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const file = document.getElementById("productImage").files[0];
+    const editIndex = document.getElementById("editIndex").value;
+
+    const save = image => {
+      const old = editIndex !== "" ? products[Number(editIndex)] : null;
+
+      const product = {
+        name: document.getElementById("productName").value.trim(),
+        price: Number(document.getElementById("productPrice").value),
+        category: document.getElementById("productCategory").value,
+        description: document.getElementById("productDescription").value.trim(),
+        image: image || (old ? old.image : "")
+      };
+
+      if (editIndex !== "") {
+        products[Number(editIndex)] = product;
+      } else {
+        products.push(product);
+      }
+
+      resetProductForm();
+      updateDashboard();
+      showPage("products");
+      alert("تم حفظ المنتج في النسخة التجريبية.");
+    };
+
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        alert("حجم الصورة يجب ألا يتجاوز 2 ميغابايت.");
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = () => save(reader.result);
+      reader.readAsDataURL(file);
+    } else {
+      save("");
+    }
+  });
+
+  function editProduct(index) {
+    const product = products[index];
+
+    document.getElementById("editIndex").value = index;
+    document.getElementById("productName").value = product.name;
+    document.getElementById("productPrice").value = product.price;
+    document.getElementById("productCategory").value = product.category;
+    document.getElementById("productDescription").value = product.description;
+
+    document.getElementById("formTitle").textContent = "تعديل المنتج";
+    showPage("addProduct");
+  }
+
+  function deleteProduct(index) {
+    if (!confirm("هل تريد حذف هذا المنتج من التجربة؟")) return;
+    products.splice(index, 1);
+    updateDashboard();
+  }
+
+  function resetProductForm() {
+    document.getElementById("productForm").reset();
+    document.getElementById("editIndex").value = "";
+    document.getElementById("formTitle").textContent = "إضافة منتج جديد";
+  }
+
+  document.getElementById("settingsForm").addEventListener("submit", function(event) {
+    event.preventDefault();
+
+    const name = document.getElementById("settingsProjectName").value.trim();
+
+    if (name) {
+      document.getElementById("projectName").textContent = name;
+      alert("تم تغيير الاسم في هذه التجربة.");
+    }
+  });
+
+  function logout() {
+    if (confirm("هل تريد العودة إلى الصفحة الرئيسية؟")) {
+      window.location.href = "index.html";
+    }
+  }
+
+  updateDashboard();
+</script>
+
+</body>
+</html>
