@@ -1,0 +1,255 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>المتاجر | مشروعي</title>
+<style>
+:root{
+  --purple:#452078;
+  --purple2:#6e35a0;
+  --gold:#c99732;
+  --bg:#faf8fc;
+  --text:#292333;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Tahoma,Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+}
+header{
+  background:var(--purple);
+  color:white;
+  padding:18px 6%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+}
+.logo{font-size:25px;font-weight:bold}
+.logo span{color:#e7bd68}
+header a{
+  color:white;
+  text-decoration:none;
+  border:1px solid #ffffff55;
+  padding:10px 16px;
+  border-radius:9px;
+}
+.hero{
+  padding:45px 6% 30px;
+  text-align:center;
+  background:linear-gradient(135deg,#452078,#7042a0);
+  color:white;
+}
+.hero h1{margin:0 0 12px;font-size:30px}
+.hero p{color:#eee;margin:0}
+.container{max-width:1100px;margin:30px auto;padding:0 18px}
+.filters{
+  background:white;
+  padding:20px;
+  border-radius:15px;
+  box-shadow:0 4px 18px #34204a0d;
+  display:grid;
+  grid-template-columns:2fr 1fr 1fr;
+  gap:12px;
+  margin-bottom:25px;
+}
+input,select{
+  width:100%;
+  padding:13px;
+  border:1px solid #e4dce9;
+  border-radius:9px;
+  font-size:15px;
+  background:white;
+  outline:none;
+}
+input:focus,select:focus{border-color:var(--purple2)}
+.section-title{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin:25px 0 18px;
+}
+.section-title h2{color:var(--purple);margin:0}
+#count{color:#777;font-size:14px}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+  gap:18px;
+}
+.store{
+  background:white;
+  border:1px solid #eee8f2;
+  border-radius:15px;
+  overflow:hidden;
+  transition:.2s;
+}
+.store:hover{
+  transform:translateY(-4px);
+  box-shadow:0 8px 22px #45207815;
+}
+.store-top{
+  height:105px;
+  background:linear-gradient(135deg,#eee5f8,#f9f4e9);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:43px;
+}
+.store-body{padding:17px}
+.store h3{margin:0 0 9px;color:var(--purple);font-size:19px}
+.store p{color:#777;font-size:14px;margin:7px 0}
+.tag{
+  display:inline-block;
+  background:#f2ebf8;
+  color:var(--purple);
+  padding:6px 10px;
+  border-radius:20px;
+  font-size:12px;
+  margin-top:8px;
+}
+.store a{
+  display:block;
+  text-align:center;
+  background:var(--purple);
+  color:white;
+  text-decoration:none;
+  padding:11px;
+  border-radius:9px;
+  margin-top:16px;
+}
+.store a:hover{background:var(--purple2)}
+.empty{
+  text-align:center;
+  padding:40px 15px;
+  color:#777;
+  background:white;
+  border-radius:14px;
+  display:none;
+}
+footer{
+  text-align:center;
+  padding:25px;
+  color:#888;
+  font-size:13px;
+}
+@media(max-width:650px){
+  .filters{grid-template-columns:1fr}
+  .hero h1{font-size:24px}
+  header{padding:15px 18px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">مشروعي <span>✦</span></div>
+  <a href="index.html">الصفحة الرئيسية</a>
+</header>
+
+<section class="hero">
+  <h1>اكتشف المتاجر والمشاريع الجزائرية</h1>
+  <p>تسوّق منتجات مميزة واكتشف أصحاب المشاريع بالقرب منك.</p>
+</section>
+
+<main class="container">
+  <div class="filters">
+    <input id="search" type="search" placeholder="ابحث عن متجر أو منتج...">
+
+    <select id="category">
+      <option value="">كل التصنيفات</option>
+      <option>الحلويات والمأكولات</option>
+      <option>الملابس والخياطة</option>
+      <option>العطور والتجميل</option>
+      <option>الهدايا والتغليف</option>
+      <option>الصناعات التقليدية</option>
+      <option>الإلكترونيات</option>
+      <option>الأثاث والمنزل</option>
+      <option>خدمات متنوعة</option>
+    </select>
+
+    <select id="wilaya">
+      <option value="">كل الولايات</option>
+      <option>غليزان</option>
+      <option>وهران</option>
+      <option>الجزائر</option>
+      <option>تلمسان</option>
+      <option>مستغانم</option>
+      <option>الشلف</option>
+      <option>تيارت</option>
+      <option>سيدي بلعباس</option>
+      <option>معسكر</option>
+    </select>
+  </div>
+
+  <div class="section-title">
+    <h2>المتاجر</h2>
+    <span id="count"></span>
+  </div>
+
+  <div class="grid" id="stores"></div>
+  <div class="empty" id="empty">لا توجد متاجر مطابقة لبحثك حالياً.</div>
+</main>
+
+<footer>
+  مشروعي © 2026 — منصة تجمع المشاريع الجزائرية
+</footer>
+
+<script>
+// بيانات تجريبية للعرض الأولي فقط
+const demoStores = [
+  {name:"حلويات السعادة",category:"الحلويات والمأكولات",wilaya:"غليزان",icon:"🍰",description:"حلويات تقليدية وعصرية"},
+  {name:"أناقة للخياطة",category:"الملابس والخياطة",wilaya:"وهران",icon:"👗",description:"ملابس وخياطة حسب الطلب"},
+  {name:"لمسة للعطور",category:"العطور والتجميل",wilaya:"الجزائر",icon:"🌸",description:"عطور ومنتجات تجميل"},
+  {name:"هدايا المحبة",category:"الهدايا والتغليف",wilaya:"مستغانم",icon:"🎁",description:"هدايا وتغليف للمناسبات"},
+  {name:"صناعة بلادي",category:"الصناعات التقليدية",wilaya:"تلمسان",icon:"🏺",description:"منتجات وحرف تقليدية"},
+  {name:"عالم الإلكترونيات",category:"الإلكترونيات",wilaya:"الشلف",icon:"📱",description:"إكسسوارات وأجهزة إلكترونية"}
+];
+
+const storesElement=document.getElementById("stores");
+const search=document.getElementById("search");
+const category=document.getElementById("category");
+const wilaya=document.getElementById("wilaya");
+
+function renderStores(){
+  const term=search.value.trim().toLowerCase();
+
+  const filtered=demoStores.filter(store=>
+    (store.name.toLowerCase().includes(term) ||
+     store.description.toLowerCase().includes(term)) &&
+    (!category.value || store.category===category.value) &&
+    (!wilaya.value || store.wilaya===wilaya.value)
+  );
+
+  storesElement.innerHTML=filtered.map(store=>`
+    <article class="store">
+      <div class="store-top">${store.icon}</div>
+      <div class="store-body">
+        <h3>${store.name}</h3>
+        <p>📍 ${store.wilaya}</p>
+        <p>${store.description}</p>
+        <span class="tag">${store.category}</span>
+        <a href="store.html">اكتشف المتجر</a>
+      </div>
+    </article>
+  `).join("");
+
+  document.getElementById("count").textContent=
+    filtered.length+" متجر";
+
+  document.getElementById("empty").style.display=
+    filtered.length ? "none" : "block";
+}
+
+search.addEventListener("input",renderStores);
+category.addEventListener("change",renderStores);
+wilaya.addEventListener("change",renderStores);
+
+renderStores();
+</script>
+</body>
+</html>
