@@ -5,6 +5,7 @@ const express = require("express");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { Pool } = require("pg");
+const authRoutes = require("./routes/auth");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -12,6 +13,19 @@ const PORT = process.env.PORT || 10000;
 // إعدادات الحماية الأساسية
 app.use(helmet());
 app.use(express.json({ limit: "1mb" }));
+// حماية إضافية لمسارات الحسابات
+app.use(
+  "/api/auth",
+  rateLimit({
+    windowMs: 15 * 60 * 1000,
+    limit: 30,
+    standardHeaders: "draft-7",
+    legacyHeaders: false
+  })
+);
+
+// ربط نظام التسجيل والدخول
+app.use("/api/auth", authRoutes);
 
 // تحديد عدد الطلبات لحماية الخادم
 app.use(
@@ -36,6 +50,7 @@ const pool = process.env.DATABASE_URL
       connectionTimeoutMillis: 10000
     })
   : null;
+app.locals.pool = pool;
 
 // مسار فحص الخادم وقاعدة البيانات
 app.get("/api/health", async (req, res) => {
