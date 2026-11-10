@@ -42,9 +42,7 @@
 
     .logo span { color: var(--gold); }
 
-    main {
-      padding: 45px 15px;
-    }
+    main { padding: 45px 15px; }
 
     .register-card {
       max-width: 620px;
@@ -57,7 +55,6 @@
     }
 
     .heading { text-align: center; margin-bottom: 28px; }
-
     .heading .icon { font-size: 48px; }
 
     .heading h1 {
@@ -102,7 +99,6 @@
     }
 
     .password-wrap { position: relative; }
-
     .password-wrap input { padding-left: 48px; }
 
     .show-password {
@@ -131,6 +127,11 @@
     }
 
     .submit:hover { background: var(--purple2); }
+
+    .submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
 
     .terms {
       font-size: 12px;
@@ -162,8 +163,14 @@
       padding: 12px;
       border-radius: 9px;
       font-size: 13px;
+      line-height: 1.7;
       background: #fff5e2;
       color: #79571a;
+    }
+
+    .message.error {
+      background: #fff0f0;
+      color: #9b3030;
     }
 
     @media (max-width: 550px) {
@@ -276,7 +283,8 @@
           <label for="password">كلمة المرور *</label>
           <div class="password-wrap">
             <input id="password" name="password" type="password"
-                   placeholder="8 أحرف على الأقل" minlength="8" required>
+                   placeholder="8 أحرف على الأقل" minlength="8"
+                   maxlength="128" required>
             <button class="show-password" type="button"
                     onclick="togglePassword('password', this)">👁</button>
           </div>
@@ -286,7 +294,8 @@
           <label for="confirmPassword">تأكيد كلمة المرور *</label>
           <div class="password-wrap">
             <input id="confirmPassword" name="confirmPassword"
-                   type="password" placeholder="أعد كتابة كلمة المرور" required>
+                   type="password" placeholder="أعد كتابة كلمة المرور"
+                   required>
             <button class="show-password" type="button"
                     onclick="togglePassword('confirmPassword', this)">👁</button>
           </div>
@@ -294,9 +303,12 @@
 
       </div>
 
-      <button class="submit" type="submit">إنشاء حساب المشروع</button>
+      <button class="submit" id="submitButton" type="submit">
+        إنشاء حساب المشروع
+      </button>
 
-      <div class="message" id="message"></div>
+      <div class="message" id="message" role="status"
+           aria-live="polite"></div>
 
       <p class="terms">
         بإنشاء حسابك، فإنك توافق على شروط استخدام منصة مشروعي.
@@ -320,22 +332,82 @@
     button.textContent = input.type === "password" ? "👁" : "🙈";
   }
 
-  document.getElementById("registerForm").addEventListener("submit", function(event) {
+  const registerForm = document.getElementById("registerForm");
+  const messageBox = document.getElementById("message");
+  const submitButton = document.getElementById("submitButton");
+
+  function showMessage(text, isError = false) {
+    messageBox.textContent = text;
+    messageBox.classList.toggle("error", isError);
+    messageBox.style.display = "block";
+  }
+
+  registerForm.addEventListener("submit", async function(event) {
     event.preventDefault();
 
     const password = document.getElementById("password").value;
     const confirmation = document.getElementById("confirmPassword").value;
-    const message = document.getElementById("message");
+
+    messageBox.style.display = "none";
 
     if (password !== confirmation) {
-      message.textContent = "كلمتا المرور غير متطابقتين.";
-      message.style.display = "block";
+      showMessage("كلمتا المرور غير متطابقتين. يرجى التأكد منهما.", true);
       return;
     }
 
-    message.textContent =
-      "واجهة التسجيل جاهزة. سنربطها بنظام الحسابات الآمن وقاعدة البيانات في المرحلة القادمة.";
-    message.style.display = "block";
+    const payload = {
+      fullName: document.getElementById("ownerName").value.trim(),
+      projectName: document.getElementById("projectName").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      category: document.getElementById("category").value,
+      wilaya: document.getElementById("wilaya").value,
+      commune: document.getElementById("municipality").value.trim(),
+      password: password
+    };
+
+    submitButton.disabled = true;
+    submitButton.textContent = "جارٍ إرسال طلب التسجيل...";
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "same-origin",
+        body: JSON.stringify(payload)
+      });
+
+      let result = {};
+
+      try {
+        result = await response.json();
+      } catch (_) {
+        result = {};
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || "تعذر إنشاء الحساب. يرجى مراجعة المعلومات والمحاولة مجدداً."
+        );
+      }
+
+      showMessage(
+        result.message ||
+        "تم استلام طلب تسجيلك بنجاح. حسابك ينتظر موافقة الإدارة."
+      );
+
+      registerForm.reset();
+
+    } catch (error) {
+      showMessage(
+        error.message || "تعذر الاتصال بالخادم. تحقق من الإنترنت وحاول مجدداً.",
+        true
+      );
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "إنشاء حساب المشروع";
+    }
   });
 </script>
 
