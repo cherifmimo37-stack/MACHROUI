@@ -4,6 +4,7 @@ require("dotenv").config();
 const express = require("express");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
+const path = require("path");
 const { Pool } = require("pg");
 
 const authRoutes = require("./routes/auth");
@@ -28,8 +29,28 @@ const pool = process.env.DATABASE_URL
 
 app.locals.pool = pool;
 
-// إعدادات الحماية الأساسية
-app.use(helmet());
+// إعدادات الحماية مع السماح بالسكريبتات والأنماط
+// الموجودة داخل صفحات HTML الحالية
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'"],
+        scriptSrcAttr: ["'unsafe-inline'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https:"],
+        connectSrc: ["'self'"],
+        fontSrc: ["'self'", "data:", "https:"],
+        objectSrc: ["'none'"],
+        baseUri: ["'self'"],
+        formAction: ["'self'"],
+        frameAncestors: ["'none'"]
+      }
+    }
+  })
+);
+
 app.use(express.json({ limit: "1mb" }));
 
 // حماية عامة لجميع مسارات API
@@ -63,7 +84,7 @@ app.use("/api/catalog", catalogRoutes);
 // ربط لوحة التاجر وإدارة المنتجات
 app.use("/api/seller", sellerRoutes);
 
-// مسار فحص الخادم وقاعدة البيانات
+// فحص الخادم وقاعدة البيانات
 app.get("/api/health", async (req, res) => {
   let database = "not_configured";
 
@@ -85,13 +106,25 @@ app.get("/api/health", async (req, res) => {
   });
 });
 
-// الصفحة الرئيسية المؤقتة للخادم
+// الصفحة التعريفية للـ API
 app.get("/api", (req, res) => {
   return res.json({
     success: true,
     message: "مرحباً بك في واجهة MACHROUI البرمجية"
   });
 });
+
+// تقديم صفحات الموقع من مجلد public فقط
+const publicDirectory = path.join(__dirname, "public");
+
+app.use(
+  express.static(publicDirectory, {
+    index: "index.html",
+    dotfiles: "deny",
+    fallthrough: true,
+    maxAge: 0
+  })
+);
 
 // معالجة المسارات غير الموجودة
 app.use((req, res) => {
