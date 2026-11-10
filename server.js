@@ -7,6 +7,7 @@ const rateLimit = require("express-rate-limit");
 const { Pool } = require("pg");
 const authRoutes = require("./routes/auth");
 const catalogRoutes = require("./routes/catalog");
+const sellerRoutes = require("./routes/seller");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -29,7 +30,7 @@ app.use(
 app.use("/api/auth", authRoutes);
 // ربط واجهة المتاجر والمنتجات
 app.use("/api/catalog", catalogRoutes);
-
+app.use("/api/seller", sellerRoutes);
 // تحديد عدد الطلبات لحماية الخادم
 app.use(
   "/api/",
