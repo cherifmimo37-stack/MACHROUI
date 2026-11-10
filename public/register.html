@@ -1,0 +1,415 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#452078">
+  <title>إنشاء حساب صاحب مشروع | مشروعي</title>
+
+  <style>
+    :root {
+      --purple: #452078;
+      --purple2: #6e35a0;
+      --gold: #c99732;
+      --bg: #faf8fc;
+      --text: #30283a;
+      --muted: #777181;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: Tahoma, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    header {
+      background: white;
+      padding: 17px 22px;
+      border-bottom: 1px solid #eee8f4;
+    }
+
+    .logo {
+      max-width: 1050px;
+      margin: auto;
+      color: var(--purple);
+      font-size: 24px;
+      font-weight: 900;
+    }
+
+    .logo span { color: var(--gold); }
+
+    main { padding: 45px 15px; }
+
+    .register-card {
+      max-width: 620px;
+      margin: auto;
+      background: white;
+      padding: 32px;
+      border: 1px solid #eee8f4;
+      border-radius: 20px;
+      box-shadow: 0 12px 40px #4520780d;
+    }
+
+    .heading { text-align: center; margin-bottom: 28px; }
+    .heading .icon { font-size: 48px; }
+
+    .heading h1 {
+      color: var(--purple);
+      font-size: 27px;
+      margin: 8px 0;
+    }
+
+    .heading p { color: var(--muted); font-size: 14px; }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 17px;
+    }
+
+    .field { margin-bottom: 17px; }
+    .full { grid-column: 1 / -1; }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: bold;
+      margin-bottom: 7px;
+      color: var(--purple);
+    }
+
+    input, select {
+      width: 100%;
+      padding: 13px;
+      border: 1px solid #e5ddec;
+      border-radius: 10px;
+      background: #fff;
+      font-family: inherit;
+      font-size: 14px;
+      outline: none;
+    }
+
+    input:focus, select:focus {
+      border-color: var(--purple2);
+      box-shadow: 0 0 0 3px #6e35a015;
+    }
+
+    .password-wrap { position: relative; }
+    .password-wrap input { padding-left: 48px; }
+
+    .show-password {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      border: 0;
+      background: transparent;
+      cursor: pointer;
+      font-size: 18px;
+    }
+
+    .submit {
+      width: 100%;
+      border: none;
+      background: var(--purple);
+      color: white;
+      padding: 15px;
+      border-radius: 11px;
+      font-family: inherit;
+      font-weight: bold;
+      font-size: 16px;
+      cursor: pointer;
+      margin-top: 8px;
+    }
+
+    .submit:hover { background: var(--purple2); }
+
+    .submit:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+    }
+
+    .terms {
+      font-size: 12px;
+      color: var(--muted);
+      text-align: center;
+      margin: 15px 0;
+    }
+
+    .login-link {
+      text-align: center;
+      margin-top: 18px;
+      font-size: 14px;
+    }
+
+    .login-link a { color: var(--purple2); font-weight: bold; }
+
+    .back {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: var(--muted);
+      font-size: 13px;
+      text-decoration: none;
+    }
+
+    .message {
+      display: none;
+      margin-top: 15px;
+      padding: 12px;
+      border-radius: 9px;
+      font-size: 13px;
+      line-height: 1.7;
+      background: #fff5e2;
+      color: #79571a;
+    }
+
+    .message.error {
+      background: #fff0f0;
+      color: #9b3030;
+    }
+
+    @media (max-width: 550px) {
+      .register-card { padding: 23px 17px; }
+      .form-grid { grid-template-columns: 1fr; gap: 0; }
+      .full { grid-column: auto; }
+      .heading h1 { font-size: 23px; }
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">مشروعي <span>| MACHROUI</span></div>
+</header>
+
+<main>
+  <section class="register-card">
+
+    <div class="heading">
+      <div class="icon">🏪</div>
+      <h1>أنشئ حساب مشروعك</h1>
+      <p>انضم إلى مشروعي وابدأ بعرض منتجاتك لزبائنك</p>
+    </div>
+
+    <form id="registerForm">
+
+      <div class="form-grid">
+
+        <div class="field">
+          <label for="ownerName">اسم صاحب المشروع *</label>
+          <input id="ownerName" name="ownerName" type="text"
+                 placeholder="الاسم الكامل" required>
+        </div>
+
+        <div class="field">
+          <label for="projectName">اسم المشروع *</label>
+          <input id="projectName" name="projectName" type="text"
+                 placeholder="اسم متجرك أو مشروعك" required>
+        </div>
+
+        <div class="field">
+          <label for="phone">رقم الهاتف *</label>
+          <input id="phone" name="phone" type="tel"
+                 placeholder="مثال: 0550123456"
+                 pattern="0[567][0-9]{8}" maxlength="10"
+                 inputmode="numeric" required>
+        </div>
+
+        <div class="field">
+          <label for="category">نوع المشروع *</label>
+          <select id="category" name="category" required>
+            <option value="">اختر التصنيف</option>
+            <option>الحلويات والمأكولات</option>
+            <option>الملابس والخياطة</option>
+            <option>العطور والتجميل</option>
+            <option>الهدايا والتغليف</option>
+            <option>الصناعات التقليدية</option>
+            <option>الإلكترونيات</option>
+            <option>الأثاث والمنزل</option>
+            <option>خدمات متنوعة</option>
+            <option>أخرى</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="wilaya">الولاية *</label>
+          <select id="wilaya" name="wilaya" required>
+            <option value="">اختر الولاية</option>
+            <option>أدرار</option><option>الشلف</option>
+            <option>الأغواط</option><option>أم البواقي</option>
+            <option>باتنة</option><option>بجاية</option>
+            <option>بسكرة</option><option>بشار</option>
+            <option>البليدة</option><option>البويرة</option>
+            <option>تمنراست</option><option>تبسة</option>
+            <option>تلمسان</option><option>تيارت</option>
+            <option>تيزي وزو</option><option>الجزائر</option>
+            <option>الجلفة</option><option>جيجل</option>
+            <option>سطيف</option><option>سعيدة</option>
+            <option>سكيكدة</option><option>سيدي بلعباس</option>
+            <option>عنابة</option><option>قالمة</option>
+            <option>قسنطينة</option><option>المدية</option>
+            <option>مستغانم</option><option>المسيلة</option>
+            <option>معسكر</option><option>ورقلة</option>
+            <option>وهران</option><option>البيض</option>
+            <option>إليزي</option><option>برج بوعريريج</option>
+            <option>بومرداس</option><option>الطارف</option>
+            <option>تندوف</option><option>تيسمسيلت</option>
+            <option>الوادي</option><option>خنشلة</option>
+            <option>سوق أهراس</option><option>تيبازة</option>
+            <option>ميلة</option><option>عين الدفلى</option>
+            <option>النعامة</option><option>عين تموشنت</option>
+            <option>غرداية</option><option>غليزان</option>
+            <option>تيميمون</option><option>برج باجي مختار</option>
+            <option>أولاد جلال</option><option>بني عباس</option>
+            <option>عين صالح</option><option>عين قزام</option>
+            <option>تقرت</option><option>جانت</option>
+            <option>المغير</option><option>المنيعة</option>
+          </select>
+        </div>
+
+        <div class="field">
+          <label for="municipality">البلدية *</label>
+          <input id="municipality" name="municipality" type="text"
+                 placeholder="اسم البلدية" required>
+        </div>
+
+        <div class="field full">
+          <label for="password">كلمة المرور *</label>
+          <div class="password-wrap">
+            <input id="password" name="password" type="password"
+                   placeholder="8 أحرف على الأقل" minlength="8"
+                   maxlength="128" required>
+            <button class="show-password" type="button"
+                    onclick="togglePassword('password', this)">👁</button>
+          </div>
+        </div>
+
+        <div class="field full">
+          <label for="confirmPassword">تأكيد كلمة المرور *</label>
+          <div class="password-wrap">
+            <input id="confirmPassword" name="confirmPassword"
+                   type="password" placeholder="أعد كتابة كلمة المرور"
+                   required>
+            <button class="show-password" type="button"
+                    onclick="togglePassword('confirmPassword', this)">👁</button>
+          </div>
+        </div>
+
+      </div>
+
+      <button class="submit" id="submitButton" type="submit">
+        إنشاء حساب المشروع
+      </button>
+
+      <div class="message" id="message" role="status"
+           aria-live="polite"></div>
+
+      <p class="terms">
+        بإنشاء حسابك، فإنك توافق على شروط استخدام منصة مشروعي.
+      </p>
+
+    </form>
+
+    <div class="login-link">
+      لديك حساب بالفعل؟ <a href="login.html">تسجيل الدخول</a>
+    </div>
+
+    <a href="index.html" class="back">← العودة إلى الصفحة الرئيسية</a>
+
+  </section>
+</main>
+
+<script>
+  function togglePassword(id, button) {
+    const input = document.getElementById(id);
+    input.type = input.type === "password" ? "text" : "password";
+    button.textContent = input.type === "password" ? "👁" : "🙈";
+  }
+
+  const registerForm = document.getElementById("registerForm");
+  const messageBox = document.getElementById("message");
+  const submitButton = document.getElementById("submitButton");
+
+  function showMessage(text, isError = false) {
+    messageBox.textContent = text;
+    messageBox.classList.toggle("error", isError);
+    messageBox.style.display = "block";
+  }
+
+  registerForm.addEventListener("submit", async function(event) {
+    event.preventDefault();
+
+    const password = document.getElementById("password").value;
+    const confirmation = document.getElementById("confirmPassword").value;
+
+    messageBox.style.display = "none";
+
+    if (password !== confirmation) {
+      showMessage("كلمتا المرور غير متطابقتين. يرجى التأكد منهما.", true);
+      return;
+    }
+
+    const payload = {
+      fullName: document.getElementById("ownerName").value.trim(),
+      projectName: document.getElementById("projectName").value.trim(),
+      phone: document.getElementById("phone").value.trim(),
+      category: document.getElementById("category").value,
+      wilaya: document.getElementById("wilaya").value,
+      commune: document.getElementById("municipality").value.trim(),
+      password: password
+    };
+
+    submitButton.disabled = true;
+    submitButton.textContent = "جارٍ إرسال طلب التسجيل...";
+
+    try {
+      const response = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "same-origin",
+        body: JSON.stringify(payload)
+      });
+
+      let result = {};
+
+      try {
+        result = await response.json();
+      } catch (_) {
+        result = {};
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          result.message || "تعذر إنشاء الحساب. يرجى مراجعة المعلومات والمحاولة مجدداً."
+        );
+      }
+
+      showMessage(
+        result.message ||
+        "تم استلام طلب تسجيلك بنجاح. حسابك ينتظر موافقة الإدارة."
+      );
+
+      registerForm.reset();
+
+    } catch (error) {
+      showMessage(
+        error.message || "تعذر الاتصال بالخادم. تحقق من الإنترنت وحاول مجدداً.",
+        true
+      );
+    } finally {
+      submitButton.disabled = false;
+      submitButton.textContent = "إنشاء حساب المشروع";
+    }
+  });
+</script>
+
+</body>
+</html>
