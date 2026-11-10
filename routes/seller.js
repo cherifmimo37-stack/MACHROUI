@@ -1,13 +1,14 @@
 
+
 const express = require("express");
 const { requireAuth, requireRole } = require("../middleware/auth");
 
 const router = express.Router();
+
 function isValidUUID(value) {
   return typeof value === "string" &&
     /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
-
 
 function validateProduct(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
@@ -32,7 +33,6 @@ function validateProduct(data) {
   }
 
   const price = Number(rawPrice);
-
   const rawStock = data.stock_quantity;
 
   const stock =
@@ -62,7 +62,6 @@ function validateProduct(data) {
   return { name, description, price, stock };
 }
 
-
 async function getSellerStore(pool, userId) {
   const result = await pool.query(
     `SELECT id
@@ -79,8 +78,10 @@ async function getSellerStore(pool, userId) {
 router.use((req, res, next) => {
   return requireAuth(req.app.locals.pool)(req, res, next);
 });
+
 router.use(requireRole("seller"));
 
+// عرض منتجات التاجر
 router.get("/products", async (req, res) => {
   const pool = req.app.locals.pool;
 
@@ -95,10 +96,10 @@ router.get("/products", async (req, res) => {
     }
 
     const result = await pool.query(
-      `SELECT id, name, description, price, stock_quantity, status
+      `SELECT id, name, description, price, stock_quantity, product_status
        FROM products
        WHERE store_id = $1
-       ORDER BY id DESC`,
+       ORDER BY created_at DESC`,
       [store.id]
     );
 
@@ -140,9 +141,9 @@ router.post("/products", async (req, res) => {
 
     const result = await pool.query(
       `INSERT INTO products
-        (store_id, name, description, price, stock_quantity, status)
+        (store_id, name, description, price, stock_quantity, product_status)
        VALUES ($1, $2, $3, $4, $5, 'active')
-       RETURNING id, name, description, price, stock_quantity, status`,
+       RETURNING id, name, description, price, stock_quantity, product_status`,
       [
         store.id,
         product.name,
@@ -195,9 +196,10 @@ router.put("/products/:id", async (req, res) => {
        SET name = $1,
            description = $2,
            price = $3,
-           stock_quantity = $4
+           stock_quantity = $4,
+           updated_at = NOW()
        WHERE id = $5 AND store_id = $6
-       RETURNING id, name, description, price, stock_quantity, status`,
+       RETURNING id, name, description, price, stock_quantity, product_status`,
       [
         product.name,
         product.description,
@@ -230,7 +232,7 @@ router.put("/products/:id", async (req, res) => {
   }
 });
 
-// إخفاء المنتج دون حذف سجلّه
+// إخفاء المنتج دون حذف سجله
 router.delete("/products/:id", async (req, res) => {
   const pool = req.app.locals.pool;
   const productId = req.params.id;
@@ -254,7 +256,8 @@ router.delete("/products/:id", async (req, res) => {
 
     const result = await pool.query(
       `UPDATE products
-       SET status = 'inactive'
+       SET product_status = 'inactive',
+           updated_at = NOW()
        WHERE id = $1 AND store_id = $2
        RETURNING id`,
       [productId, store.id]
@@ -282,3 +285,4 @@ router.delete("/products/:id", async (req, res) => {
 });
 
 module.exports = router;
+
