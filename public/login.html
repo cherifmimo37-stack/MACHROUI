@@ -238,6 +238,7 @@
   مشروعي | MACHROUI — منصتك لدعم المشاريع الجزائرية 🇩🇿
 </footer>
 
+
 <script>
   function togglePassword() {
     const input = document.getElementById("password");
@@ -247,22 +248,61 @@
     button.textContent = input.type === "password" ? "👁" : "🙈";
   }
 
-  function forgotPassword(event) {
-    event.preventDefault();
-    showMessage("استرجاع كلمة المرور سيكون متاحاً بعد ربط نظام الحسابات.");
-  }
-
   function showMessage(text) {
     const message = document.getElementById("message");
     message.textContent = text;
     message.style.display = "block";
   }
 
-  document.getElementById("loginForm").addEventListener("submit", function(event) {
+  document.getElementById("loginForm").addEventListener("submit", async function(event) {
     event.preventDefault();
-    showMessage(
-      "واجهة تسجيل الدخول جاهزة. سنربطها بنظام الحسابات الآمن في المرحلة القادمة."
-    );
+
+    const form = event.currentTarget;
+    const button = form.querySelector('button[type="submit"]');
+    const phone = document.getElementById("phone").value.trim();
+    const password = document.getElementById("password").value;
+
+    if (!form.reportValidity()) return;
+
+    button.disabled = true;
+    button.textContent = "جارٍ تسجيل الدخول...";
+    
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        credentials: "same-origin",
+        body: JSON.stringify({ phone, password })
+      });
+
+      const result = await response.json().catch(() => ({}));
+
+      if (!response.ok || !result.success) {
+        showMessage(result.message || "تعذر تسجيل الدخول، حاول مجدداً.");
+        return;
+      }
+
+      if (!result.user || result.user.role !== "seller") {
+        await fetch("/api/auth/logout", {
+          method: "POST",
+          credentials: "same-origin"
+        });
+
+        showMessage("هذا الحساب لا يملك صلاحية الدخول إلى لوحة التاجر.");
+        return;
+      }
+
+      showMessage("تم تسجيل الدخول بنجاح، جارٍ فتح لوحة التحكم...");
+      window.location.replace("dashboard.html");
+
+    } catch (error) {
+      showMessage("تعذر الاتصال بالخادم. تحقق من الإنترنت وحاول مجدداً.");
+    } finally {
+      button.disabled = false;
+      button.textContent = "تسجيل الدخول";
+    }
   });
 </script>
 
