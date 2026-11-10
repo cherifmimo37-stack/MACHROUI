@@ -6,6 +6,7 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const { Pool } = require("pg");
 const authRoutes = require("./routes/auth");
+const catalogRoutes = require("./routes/catalog");
 
 const app = express();
 const PORT = process.env.PORT || 10000;
@@ -26,6 +27,8 @@ app.use(
 
 // ربط نظام التسجيل والدخول
 app.use("/api/auth", authRoutes);
+// ربط واجهة المتاجر والمنتجات
+app.use("/api/catalog", catalogRoutes);
 
 // تحديد عدد الطلبات لحماية الخادم
 app.use(
