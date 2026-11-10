@@ -3,6 +3,11 @@ const express = require("express");
 const { requireAuth, requireRole } = require("../middleware/auth");
 
 const router = express.Router();
+function isValidUUID(value) {
+  return typeof value === "string" &&
+    /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
+}
+
 
 function validateProduct(data) {
   if (!data || typeof data !== "object" || Array.isArray(data)) {
@@ -17,15 +22,33 @@ function validateProduct(data) {
       ? data.description.trim().slice(0, 2000)
       : "";
 
-  const price = Number(data.price);
+  const rawPrice = data.price;
+
+  if (
+    (typeof rawPrice !== "number" && typeof rawPrice !== "string") ||
+    (typeof rawPrice === "string" && rawPrice.trim() === "")
+  ) {
+    return null;
+  }
+
+  const price = Number(rawPrice);
+
+  const rawStock = data.stock_quantity;
 
   const stock =
-    data.stock_quantity === null || data.stock_quantity === undefined ||
-    data.stock_quantity === ""
+    rawStock === null ||
+    rawStock === undefined ||
+    (typeof rawStock === "string" && rawStock.trim() === "")
       ? null
-      : Number(data.stock_quantity);
+      : (typeof rawStock === "number" || typeof rawStock === "string")
+        ? Number(rawStock)
+        : NaN;
 
-  if (name.length < 2 || !Number.isFinite(price) || price < 0) {
+  if (
+    name.length < 2 ||
+    !Number.isFinite(price) ||
+    price < 0
+  ) {
     return null;
   }
 
@@ -38,6 +61,7 @@ function validateProduct(data) {
 
   return { name, description, price, stock };
 }
+
 
 async function getSellerStore(pool, userId) {
   const result = await pool.query(
@@ -149,7 +173,7 @@ router.put("/products/:id", async (req, res) => {
   const product = validateProduct(req.body);
   const productId = req.params.id;
 
-  if (!/^\d+$/.test(productId) || !product) {
+  if (!isValidUUID(productId) || !product) {
     return res.status(400).json({
       success: false,
       message: "بيانات المنتج غير صحيحة"
@@ -211,7 +235,7 @@ router.delete("/products/:id", async (req, res) => {
   const pool = req.app.locals.pool;
   const productId = req.params.id;
 
-  if (!/^\d+$/.test(productId)) {
+  if (!isValidUUID(productId)) {
     return res.status(400).json({
       success: false,
       message: "معرّف المنتج غير صحيح"
