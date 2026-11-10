@@ -1,0 +1,351 @@
+
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إتمام الطلب | مشروعي</title>
+<style>
+:root{
+  --purple:#452078;
+  --purple2:#6e35a0;
+  --gold:#c99732;
+  --bg:#faf8fc;
+}
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:Tahoma,Arial,sans-serif;
+  background:var(--bg);
+  color:#30283a;
+}
+header{
+  background:var(--purple);
+  padding:16px 6%;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  color:white;
+}
+.logo{font-size:24px;font-weight:bold}
+.logo span{color:#e7bd68}
+header a{
+  color:white;
+  text-decoration:none;
+  border:1px solid #ffffff55;
+  padding:9px 14px;
+  border-radius:8px;
+}
+.container{
+  max-width:950px;
+  margin:30px auto;
+  padding:0 16px;
+}
+.heading{text-align:center;margin-bottom:25px}
+.heading h1{color:var(--purple);margin-bottom:8px}
+.heading p{color:#777;font-size:14px}
+.layout{
+  display:grid;
+  grid-template-columns:1.5fr 1fr;
+  gap:20px;
+  align-items:start;
+}
+.card{
+  background:white;
+  border:1px solid #eee8f2;
+  border-radius:15px;
+  padding:22px;
+  box-shadow:0 4px 15px #45207808;
+}
+.card h2{
+  font-size:19px;
+  color:var(--purple);
+  margin:0 0 20px;
+  padding-bottom:13px;
+  border-bottom:1px solid #eee8f2;
+}
+.field{margin-bottom:15px}
+.field label{
+  display:block;
+  margin-bottom:8px;
+  font-size:14px;
+  font-weight:bold;
+}
+.field input,.field select,.field textarea{
+  width:100%;
+  padding:13px;
+  border:1px solid #e3dce9;
+  border-radius:9px;
+  font-family:inherit;
+  font-size:14px;
+  background:white;
+  outline:none;
+}
+.field input:focus,.field select:focus,.field textarea:focus{
+  border-color:var(--purple2);
+}
+.field textarea{resize:vertical;min-height:85px}
+.row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.summary-product{
+  display:flex;
+  align-items:center;
+  gap:13px;
+  margin-bottom:20px;
+}
+.product-icon{
+  width:65px;
+  height:65px;
+  border-radius:12px;
+  background:#f2ebf8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:32px;
+}
+.summary-product h3{
+  color:var(--purple);
+  margin:0 0 7px;
+  font-size:16px;
+}
+.summary-product p{margin:0;color:#888;font-size:13px}
+.quantity{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:13px 0;
+  border-top:1px solid #eee;
+  border-bottom:1px solid #eee;
+}
+.quantity input{
+  width:75px;
+  padding:9px;
+  border:1px solid #ddd;
+  border-radius:8px;
+  text-align:center;
+  font-size:16px;
+}
+.total-line{
+  display:flex;
+  justify-content:space-between;
+  margin:16px 0;
+  font-size:14px;
+}
+.grand-total{
+  color:var(--purple);
+  font-size:19px;
+  font-weight:bold;
+  padding-top:15px;
+  border-top:1px solid #eee;
+}
+.submit{
+  width:100%;
+  padding:15px;
+  background:var(--purple);
+  color:white;
+  border:0;
+  border-radius:10px;
+  font-size:16px;
+  font-family:inherit;
+  cursor:pointer;
+  margin-top:12px;
+}
+.submit:hover{background:var(--purple2)}
+.note{
+  color:#8a6b2b;
+  background:#fff8e9;
+  padding:12px;
+  border-radius:9px;
+  font-size:12px;
+  line-height:1.8;
+  margin-top:15px;
+}
+footer{text-align:center;color:#999;padding:25px;font-size:13px}
+@media(max-width:700px){
+  .layout{grid-template-columns:1fr}
+  .row{grid-template-columns:1fr}
+  .container{margin:20px auto}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">مشروعي <span>✦</span></div>
+  <a href="stores.html">العودة للمتاجر</a>
+</header>
+
+<main class="container">
+
+  <div class="heading">
+    <h1>إتمام الطلب</h1>
+    <p>أدخل معلوماتك لإعداد طلبك والتواصل مع صاحب المشروع.</p>
+  </div>
+
+  <div class="layout">
+
+    <section class="card">
+      <h2>📋 معلومات الزبون</h2>
+
+      <form id="orderForm">
+
+        <div class="field">
+          <label for="customerName">الاسم الكامل *</label>
+          <input id="customerName" type="text"
+            placeholder="أدخل اسمك الكامل" required maxlength="80">
+        </div>
+
+        <div class="field">
+          <label for="phone">رقم الهاتف *</label>
+          <input id="phone" type="tel"
+            placeholder="مثال: 0550123456"
+            required maxlength="15">
+        </div>
+
+        <div class="row">
+          <div class="field">
+            <label for="wilaya">الولاية *</label>
+            <select id="wilaya" required>
+              <option value="">اختر الولاية</option>
+            </select>
+          </div>
+
+          <div class="field">
+            <label for="commune">البلدية *</label>
+            <input id="commune" type="text"
+              placeholder="اسم البلدية" required maxlength="70">
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="address">العنوان بالتفصيل *</label>
+          <input id="address" type="text"
+            placeholder="الحي، الشارع، رقم المنزل..."
+            required maxlength="180">
+        </div>
+
+        <div class="field">
+          <label for="notes">ملاحظات إضافية (اختياري)</label>
+          <textarea id="notes"
+            placeholder="أي معلومات إضافية لصاحب المشروع..."
+            maxlength="500"></textarea>
+        </div>
+
+        <button class="submit" type="submit">
+          تأكيد معلومات الطلب
+        </button>
+
+      </form>
+    </section>
+
+    <aside class="card">
+      <h2>🛍️ ملخص الطلب</h2>
+
+      <div class="summary-product">
+        <div class="product-icon" id="productIcon">🎂</div>
+        <div>
+          <h3 id="productName">كيكة الشوكولاتة</h3>
+          <p id="storeName">حلويات السعادة</p>
+        </div>
+      </div>
+
+      <div class="quantity">
+        <label for="quantity">الكمية</label>
+        <input id="quantity" type="number" min="1" max="99" value="1">
+      </div>
+
+      <div class="total-line">
+        <span>سعر الوحدة</span>
+        <strong id="unitPrice">1,800 دج</strong>
+      </div>
+
+      <div class="total-line">
+        <span>التوصيل</span>
+        <strong>يُتفق عليه مباشرة</strong>
+      </div>
+
+      <div class="total-line grand-total">
+        <span>المجموع</span>
+        <strong id="total">1,800 دج</strong>
+      </div>
+
+      <div class="note">
+        ℹ️ التوصيل في المرحلة الأولى يتم بالاتفاق المباشر بين الزبون
+        وصاحب المشروع. لا يتم تحصيل أي مبلغ عبر هذه الصفحة حالياً.
+      </div>
+    </aside>
+
+  </div>
+</main>
+
+<footer>مشروعي © 2026 — منصة تجمع المشاريع الجزائرية</footer>
+
+<script>
+const wilayas = [
+"أدرار","الشلف","الأغواط","أم البواقي","باتنة","بجاية",
+"بسكرة","بشار","البليدة","البويرة","تمنراست","تبسة",
+"تلمسان","تيارت","تيزي وزو","الجزائر","الجلفة","جيجل",
+"سطيف","سعيدة","سكيكدة","سيدي بلعباس","عنابة","قالمة",
+"قسنطينة","المدية","مستغانم","المسيلة","معسكر","ورقلة",
+"وهران","البيض","إليزي","برج بوعريريج","بومرداس",
+"الطارف","تندوف","تيسمسيلت","الوادي","خنشلة",
+"سوق أهراس","تيبازة","ميلة","عين الدفلى","النعامة",
+"عين تموشنت","غرداية","غليزان","تيميمون","برج باجي مختار",
+"أولاد جلال","بني عباس","عين صالح","عين قزام",
+"تقرت","جانت","المغير","المنيعة"
+];
+
+const params = new URLSearchParams(location.search);
+
+const product = {
+  name:params.get("product") || "كيكة الشوكولاتة",
+  store:params.get("store") || "حلويات السعادة",
+  price:Math.max(0,Number(params.get("price")) || 1800),
+  icon:params.get("icon") || "🎂"
+};
+
+const wilayaSelect=document.getElementById("wilaya");
+
+wilayas.forEach(name=>{
+  const option=document.createElement("option");
+  option.value=name;
+  option.textContent=name;
+  wilayaSelect.appendChild(option);
+});
+
+document.getElementById("productName").textContent=product.name;
+document.getElementById("storeName").textContent=product.store;
+document.getElementById("productIcon").textContent=product.icon;
+
+function updateTotal(){
+  const quantity=Math.max(1,Math.min(99,
+    Number(document.getElementById("quantity").value)||1
+  ));
+  document.getElementById("quantity").value=quantity;
+
+  const total=product.price*quantity;
+  const format=value=>value.toLocaleString("fr-DZ")+" دج";
+
+  document.getElementById("unitPrice").textContent=format(product.price);
+  document.getElementById("total").textContent=format(total);
+}
+
+document.getElementById("quantity").addEventListener("input",updateTotal);
+
+document.getElementById("orderForm").addEventListener("submit",function(event){
+  event.preventDefault();
+
+  alert(
+    "تم التحقق من معلوماتك بنجاح، لكن إرسال الطلب الحقيقي لم يُفعّل بعد.\n\n"+
+    "سنربط هذه الصفحة بنظام الطلبات وقاعدة البيانات في المرحلة القادمة."
+  );
+});
+
+updateTotal();
+</script>
+
+</body>
+</html>
