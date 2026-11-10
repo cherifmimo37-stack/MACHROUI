@@ -255,7 +255,18 @@ function renderProducts(){
 }
 
 function showOrder(name){
-  alert("سيتم تفعيل طلب "+name+" بعد ربط نظام الطلبات.");
+  const product = demoProducts.find(item => item.name === name);
+
+  if(!product) return;
+
+  const params = new URLSearchParams({
+    product: product.name,
+    store: "حلويات السعادة",
+    price: product.price,
+    icon: product.icon
+  });
+
+  window.location.href = "order.html?" + params.toString();
 }
 
 search.addEventListener("input",renderProducts);
