@@ -200,56 +200,153 @@ footer{
 </footer>
 
 <script>
-// بيانات تجريبية للعرض الأولي فقط
-const demoStores = [
-  {name:"حلويات السعادة",category:"الحلويات والمأكولات",wilaya:"غليزان",icon:"🍰",description:"حلويات تقليدية وعصرية"},
-  {name:"أناقة للخياطة",category:"الملابس والخياطة",wilaya:"وهران",icon:"👗",description:"ملابس وخياطة حسب الطلب"},
-  {name:"لمسة للعطور",category:"العطور والتجميل",wilaya:"الجزائر",icon:"🌸",description:"عطور ومنتجات تجميل"},
-  {name:"هدايا المحبة",category:"الهدايا والتغليف",wilaya:"مستغانم",icon:"🎁",description:"هدايا وتغليف للمناسبات"},
-  {name:"صناعة بلادي",category:"الصناعات التقليدية",wilaya:"تلمسان",icon:"🏺",description:"منتجات وحرف تقليدية"},
-  {name:"عالم الإلكترونيات",category:"الإلكترونيات",wilaya:"الشلف",icon:"📱",description:"إكسسوارات وأجهزة إلكترونية"}
-];
+// ================= REAL STORES =================
 
-const storesElement=document.getElementById("stores");
-const search=document.getElementById("search");
-const category=document.getElementById("category");
-const wilaya=document.getElementById("wilaya");
+const storesContainer = document.getElementById("storesContainer");
+const searchInput = document.getElementById("searchInput");
+const categoryFilter = document.getElementById("categoryFilter");
+const wilayaFilter = document.getElementById("wilayaFilter");
+const storesCount = document.getElementById("storesCount");
 
-function renderStores(){
-  const term=search.value.trim().toLowerCase();
+let storesRequestId = 0;
 
-  const filtered=demoStores.filter(store=>
-    (store.name.toLowerCase().includes(term) ||
-     store.description.toLowerCase().includes(term)) &&
-    (!category.value || store.category===category.value) &&
-    (!wilaya.value || store.wilaya===wilaya.value)
-  );
-
-  storesElement.innerHTML=filtered.map(store=>`
-    <article class="store">
-      <div class="store-top">${store.icon}</div>
-      <div class="store-body">
-        <h3>${store.name}</h3>
-        <p>📍 ${store.wilaya}</p>
-        <p>${store.description}</p>
-        <span class="tag">${store.category}</span>
-        <a href="store.html">اكتشف المتجر</a>
-      </div>
-    </article>
-  `).join("");
-
-  document.getElementById("count").textContent=
-    filtered.length+" متجر";
-
-  document.getElementById("empty").style.display=
-    filtered.length ? "none" : "block";
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
 }
 
-search.addEventListener("input",renderStores);
-category.addEventListener("change",renderStores);
-wilaya.addEventListener("change",renderStores);
+async function loadStores() {
 
-renderStores();
+    const requestId = ++storesRequestId;
+
+    const params = new URLSearchParams();
+
+    const search = searchInput.value.trim();
+    const category = categoryFilter.value;
+    const wilaya = wilayaFilter.value;
+
+    if (search) params.set("search", search);
+    if (category) params.set("category", category);
+    if (wilaya) params.set("wilaya", wilaya);
+
+    storesContainer.innerHTML = `
+        <div class="empty-state">
+            جاري تحميل المتاجر...
+        </div>
+    `;
+
+    try {
+
+        const response = await fetch(
+            `/api/catalog/stores?${params.toString()}`
+        );
+
+        if (!response.ok) {
+            throw new Error("تعذر تحميل المتاجر");
+        }
+
+        const data = await response.json();
+
+        if (requestId !== storesRequestId) return;
+
+        if (!data.success || !Array.isArray(data.stores)) {
+            throw new Error("بيانات المتاجر غير صالحة");
+        }
+
+        const stores = data.stores;
+
+        if (storesCount) {
+            storesCount.textContent = stores.length;
+        }
+
+        if (stores.length === 0) {
+
+            storesContainer.innerHTML = `
+                <div class="empty-state">
+                    لا توجد متاجر مطابقة لبحثك حالياً.
+                </div>
+            `;
+
+            return;
+        }
+
+        storesContainer.innerHTML = stores.map(store => {
+
+            const name = escapeHTML(store.name);
+            const description = escapeHTML(
+                store.description || "اكتشف منتجات هذا المتجر"
+            );
+            const wilayaName = escapeHTML(store.wilaya || "");
+            const categoryName = escapeHTML(
+                store.category || "متجر"
+            );
+            const slug = encodeURIComponent(store.slug || "");
+
+            const logo = store.logo_url
+                ? `<img src="${escapeHTML(store.logo_url)}"
+                    alt="${name}"
+                    class="store-logo">`
+                : `<div class="store-logo-placeholder">🏪</div>`;
+
+            return `
+                <div class="store-card">
+
+                    ${logo}
+
+                    <div class="store-info">
+
+                        <h3>${name}</h3>
+
+                        <p>${description}</p>
+
+                        <div class="store-meta">
+                            <span>${categoryName}</span>
+                            <span>${wilayaName}</span>
+                        </div>
+
+                        <a href="store.html?slug=${slug}"
+                           class="store-button">
+                            زيارة المتجر
+                        </a>
+
+                    </div>
+
+                </div>
+            `;
+
+        }).join("");
+
+    } catch (error) {
+
+        if (requestId !== storesRequestId) return;
+
+        storesContainer.innerHTML = `
+            <div class="empty-state">
+                حدث خطأ أثناء تحميل المتاجر.
+                حاول مرة أخرى.
+            </div>
+        `;
+
+        console.error(error);
+    }
+}
+
+// البحث والتصفية
+
+searchInput.addEventListener("input", loadStores);
+
+categoryFilter.addEventListener("change", loadStores);
+
+wilayaFilter.addEventListener("change", loadStores);
+
+// تحميل المتاجر عند فتح الصفحة
+
+loadStores();
 </script>
 </body>
 </html>
