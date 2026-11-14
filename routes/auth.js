@@ -172,8 +172,8 @@ router.post("/register", async (req, res) => {
           phone,
           store_status
         )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
-      [
+VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')`,
+[
         userId,
         data.projectName,
         slug,
@@ -189,7 +189,7 @@ router.post("/register", async (req, res) => {
 
     return res.status(201).json({
       success: true,
-      message: "تم استلام طلب التسجيل، حسابك ينتظر موافقة الإدارة"
+      message: "تم إنشاء حسابك ومتجرك بنجاح! يمكنك الآن تسجيل الدخول."
     });
 
   } catch (error) {
