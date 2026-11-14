@@ -202,11 +202,12 @@ footer{
 <script>
 // ================= REAL STORES =================
 
-const storesContainer = document.getElementById("storesContainer");
-const searchInput = document.getElementById("searchInput");
-const categoryFilter = document.getElementById("categoryFilter");
-const wilayaFilter = document.getElementById("wilayaFilter");
-const storesCount = document.getElementById("storesCount");
+const storesContainer = document.getElementById("stores");
+const searchInput = document.getElementById("search");
+const categoryFilter = document.getElementById("category");
+const wilayaFilter = document.getElementById("wilaya");
+const storesCount = document.getElementById("count");
+const emptyState = document.getElementById("empty");
 
 let storesRequestId = 0;
 
@@ -226,19 +227,25 @@ async function loadStores() {
 
     const params = new URLSearchParams();
 
-    const search = searchInput.value.trim();
-    const category = categoryFilter.value;
-    const wilaya = wilayaFilter.value;
+    if (searchInput.value.trim()) {
+        params.set("search", searchInput.value.trim());
+    }
 
-    if (search) params.set("search", search);
-    if (category) params.set("category", category);
-    if (wilaya) params.set("wilaya", wilaya);
+    if (categoryFilter.value) {
+        params.set("category", categoryFilter.value);
+    }
+
+    if (wilayaFilter.value) {
+        params.set("wilaya", wilayaFilter.value);
+    }
 
     storesContainer.innerHTML = `
-        <div class="empty-state">
+        <div class="empty">
             جاري تحميل المتاجر...
         </div>
     `;
+
+    emptyState.style.display = "none";
 
     try {
 
@@ -260,20 +267,17 @@ async function loadStores() {
 
         const stores = data.stores;
 
-        if (storesCount) {
-            storesCount.textContent = stores.length;
-        }
+        storesCount.textContent = `${stores.length} متجر`;
 
         if (stores.length === 0) {
 
-            storesContainer.innerHTML = `
-                <div class="empty-state">
-                    لا توجد متاجر مطابقة لبحثك حالياً.
-                </div>
-            `;
+            storesContainer.innerHTML = "";
+            emptyState.style.display = "block";
 
             return;
         }
+
+        emptyState.style.display = "none";
 
         storesContainer.innerHTML = stores.map(store => {
 
@@ -281,36 +285,47 @@ async function loadStores() {
             const description = escapeHTML(
                 store.description || "اكتشف منتجات هذا المتجر"
             );
-            const wilayaName = escapeHTML(store.wilaya || "");
-            const categoryName = escapeHTML(
+
+            const category = escapeHTML(
                 store.category || "متجر"
             );
+
+            const wilaya = escapeHTML(
+                store.wilaya || ""
+            );
+
             const slug = encodeURIComponent(store.slug || "");
 
             const logo = store.logo_url
-                ? `<img src="${escapeHTML(store.logo_url)}"
-                    alt="${name}"
-                    class="store-logo">`
-                : `<div class="store-logo-placeholder">🏪</div>`;
+                ? `
+                    <img
+                        src="${escapeHTML(store.logo_url)}"
+                        alt="${name}"
+                        style="width:75px;height:75px;object-fit:cover;border-radius:50%;"
+                    >
+                `
+                : "🏪";
 
             return `
-                <div class="store-card">
+                <div class="store">
 
-                    ${logo}
+                    <div class="store-top">
+                        ${logo}
+                    </div>
 
-                    <div class="store-info">
+                    <div class="store-body">
 
                         <h3>${name}</h3>
 
                         <p>${description}</p>
 
-                        <div class="store-meta">
-                            <span>${categoryName}</span>
-                            <span>${wilayaName}</span>
-                        </div>
+                        <span class="tag">
+                            ${category}
+                        </span>
 
-                        <a href="store.html?slug=${slug}"
-                           class="store-button">
+                        <p>📍 ${wilaya}</p>
+
+                        <a href="store.html?slug=${slug}">
                             زيارة المتجر
                         </a>
 
@@ -325,12 +340,12 @@ async function loadStores() {
 
         if (requestId !== storesRequestId) return;
 
-        storesContainer.innerHTML = `
-            <div class="empty-state">
-                حدث خطأ أثناء تحميل المتاجر.
-                حاول مرة أخرى.
-            </div>
-        `;
+        storesContainer.innerHTML = "";
+
+        emptyState.textContent =
+            "حدث خطأ أثناء تحميل المتاجر. حاول مرة أخرى.";
+
+        emptyState.style.display = "block";
 
         console.error(error);
     }
@@ -344,7 +359,7 @@ categoryFilter.addEventListener("change", loadStores);
 
 wilayaFilter.addEventListener("change", loadStores);
 
-// تحميل المتاجر عند فتح الصفحة
+// تحميل المتاجر
 
 loadStores();
 </script>
