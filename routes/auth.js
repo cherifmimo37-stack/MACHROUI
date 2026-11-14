@@ -138,7 +138,7 @@ router.post("/register", async (req, res) => {
     const userResult = await client.query(
       `INSERT INTO users
         (full_name, phone, password_hash, role, account_status)
-       VALUES ($1, $2, $3, 'seller', 'pending')
+       VALUES ($1, $2, $3, 'seller', 'active')
        RETURNING id`,
       [
         data.fullName,
@@ -172,7 +172,7 @@ router.post("/register", async (req, res) => {
           phone,
           store_status
         )
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pending')`,
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'active')
       [
         userId,
         data.projectName,
